@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>Bugo:ZenBlock</id>
+	<name>Zen Block</name>
+	<version>0.7</version>
+	<type>modification</type>
+	
+	<install for="2.0 - 2.0.99">
+		<readme parsebbc="true" lang="russian-utf8">readme/russian-utf8.txt</readme>
+		<readme parsebbc="true" lang="russian">readme/russian.txt</readme>
+		<readme parsebbc="true">readme/readme.txt</readme>
+		<require-dir name="default/css" destination="$themedir" />
+		<require-dir name="default/images" destination="$themedir" />
+		<require-dir name="default/languages" destination="$themedir" />
+		<require-dir name="default/scripts" destination="$themedir" />
+		<require-file name="default/ZenBlock.template.php" destination="$themedir" />
+		<require-file name="core/Subs-ZenBlock.php" destination="$sourcedir" />
+		<code>hooks.php</code>
+		<redirect url="?action=admin;area=modsettings;sa=zen" timeout="1000" />
+	</install>
+	
+	<uninstall for="2.0 - 2.0.99">
+		<code>hooks.php</code>
+		<remove-file name="$languagedir/ZenBlock.english.php" />
+		<remove-file name="$languagedir/ZenBlock.russian.php" />
+		<remove-file name="$languagedir/ZenBlock.russian-utf8.php" />
+		<remove-file name="$themedir/css/zen.css" />
+		<remove-file name="$themedir/scripts/jquery.zen.js" />
+		<remove-file name="$themedir/ZenBlock.template.php" />
+		<remove-file name="$sourcedir/Subs-ZenBlock.php" />
+		<remove-dir name="$themedir/images/zen" />
+		<redirect url="?action=admin;area=packages;sa=browse" timeout="1000" />
+	</uninstall>
+	
+</package-info>

@@ -1,0 +1,5 @@
+[center][color=red][size=16pt][b]Zen Block[/b][/size][/color]
+[color=blue][b][size=10pt]By Bugo[/size][/b][/color]
+
+[color=green]Zen Block Ч небольшой блок, отображающий содержание самого первого сообщени€ каждой темы в еЄ верхней части, с возможностью добавить понравившуюс€ тему в закладки.[/color]
+ роме того, если текуща€ тема попул€рна (имеет наибольшее количество ответов), вы увидите синюю птичку в правом нижнем углу блока.[/center][hr]»спользуетс€ несколько иконок из бесплатных коллекций [url=http://p.yusukekamiyamane.com/]Fugue Icons[/url] и [url=http://www.fatcow.com/free-icons]Farm-Fresh Web Icons[/url], а также jQuery-скрипт [url=https://github.com/mikemerritt/TinyTips]TinyTips[/url].[hr]–аспростран€етс€ по лицензии [url=http://opensource.org/licenses/artistic-license-2.0]Artistic License 2.0[/url]

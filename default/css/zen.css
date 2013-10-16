@@ -1,0 +1,82 @@
+/* Zen Block */
+#zen {
+	width: 100%;
+}
+#zen .information {
+	border-radius: 6px;
+	margin: 0;
+	text-align: center;
+}
+#zen .description {
+	background: none;
+	border: none;
+	padding: 0;
+}
+#first_message {
+	float: left;
+	width: 79.5%;
+}
+#zen_attach {
+	float: right;
+	width: 19.5%;
+}
+.darkTip .content {
+	padding: 1px;
+	border-radius: 5px;
+}
+.darkTip .bottom {
+	height: 14px;
+}
+.darkTip .content {
+	border: 6px solid #303030;
+	background: #505050;
+	color: #f8f8f8;
+}
+.darkTip .bottom {
+	background: url(../images/zen/zen_dark.png) top center no-repeat;
+}
+.zen-head {
+	cursor: pointer;
+}
+.zen-body {
+	display: none;
+}
+.zen_message {
+	max-height: 15em;
+	overflow: auto;
+}
+.zen_message .bbc_code {
+	overflow: hidden !important;
+	height: auto !important;
+}
+.full_text {
+	background-image: url(../images/zen/zen_expand.png);
+	background-position: 1em center;
+	background-repeat: no-repeat;
+	display: block;
+}
+.mini_text {
+	background-image: url(../images/zen/zen_collapse.png);
+	background-position: 1em center;
+	background-repeat: no-repeat;
+	display: block;
+}
+.zen_symbol {
+	font-size: medium;
+	text-decoration: none;
+}
+.sky {
+	border: 1px solid #B7B7B7;
+	border-radius: 6px;
+	margin: 1px;
+	padding: 0.5em 1em;
+}
+.b-share {
+	margin-top: -10px;
+}
+.b-share .b-share-form-button, .b-share__text {
+	font-size: 1.2em !important;
+}
+#plusone-zen {
+	margin-top: 5px;
+}
