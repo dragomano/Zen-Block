@@ -21,7 +21,6 @@ class ZenBlock
 	{
 		add_integration_function('integrate_load_theme', 'ZenBlock::loadTheme', false);
 		add_integration_function('integrate_menu_buttons', 'ZenBlock::menuButtons', false);
-		add_integration_function('integrate_actions', 'ZenBlock::actions', false);
 		add_integration_function('integrate_admin_areas', 'ZenBlock::adminAreas', false);
 		add_integration_function('integrate_modify_modifications', 'ZenBlock::modifyModifications', false);
 	}
@@ -38,15 +37,12 @@ class ZenBlock
 		if (empty($modSettings['zen_block_enable']) || empty($context['current_board']))
 			return;
 
-		$ignore_boards = array();
+		$ignored_boards = array();
 
-		if (!empty($modSettings['zen_ignore_boards']))
-			$ignore_boards = explode(",", $modSettings['zen_ignore_boards']);
+		if (!empty($modSettings['zen_ignored_boards']))
+			$ignored_boards = explode(",", $modSettings['zen_ignored_boards']);
 
-		if (!empty($modSettings['recycle_board']))
-			$ignore_boards[] = $modSettings['recycle_board'];
-
-		if (in_array($context['current_board'], $ignore_boards))
+		if (in_array($context['current_board'], $ignored_boards))
 			return;
 
 		if (!empty($context['current_topic']) && isset($context['topic_first_message'])) {
@@ -144,8 +140,8 @@ class ZenBlock
 			$config_vars[] = array('large_text', 'zen_yashare_array', '" style="width:80%');
 		}
 
-		$config_vars[] = array('title', 'zen_ignore_boards');
-		$config_vars[] = array('desc', 'zen_ignore_boards_desc');
+		$config_vars[] = array('title', 'zen_ignored_boards');
+		$config_vars[] = array('desc', 'zen_ignored_boards_desc');
 		$config_vars[] = array('callback', 'zen_ignored_boards');
 
 		// Saving?
@@ -171,7 +167,7 @@ class ZenBlock
 
 			checkSession();
 			saveDBSettings($config_vars);
-			updateSettings(array('zen_ignore_boards' => $_POST['ignore_boards']));
+			updateSettings(array('zen_ignored_boards' => $_POST['ignore_boards']));
 			redirectexit('action=admin;area=modsettings;sa=zen');
 		}
 

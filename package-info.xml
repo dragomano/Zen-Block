@@ -19,7 +19,6 @@
 	<uninstall for="2.0 - 2.0.99">
 		<code>hooks.php</code>
 		<remove-file name="$themedir/css/zen.css" />
-		<remove-file name="$themedir/scripts/jquery.zen.js" />
 		<remove-file name="$themedir/ZenBlock.template.php" />
 		<remove-file name="$sourcedir/Class-ZenBlock.php" />
 		<remove-dir name="$themedir/images/zen" />
