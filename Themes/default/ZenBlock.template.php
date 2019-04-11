@@ -23,7 +23,7 @@ function show_zen_block()
 	if (!empty($modSettings['zen_yashare'])) {
 		echo '
 							<script src="//yastatic.net/share2/share.js" async="async"></script>
-							<span class="ya-share2" data-services="', str_replace(' ', '', $modSettings['zen_yashare_services']), '" data-counter', $modSettings['zen_yashare'] == 'menu' ? ' data-limit="3"' : '', !empty($settings['og_image']) ? ' data-image="' . $settings['og_image'] . '"' : '', !empty($context['meta_description']) ? ' data-description="' . $context['meta_description'] . '"' : '', ' data-title="', $context['page_title'], '" data-url="', $scripturl, '?topic=', $context['current_topic'], '.0" data-lang="', $txt['lang_dictionary'], '" data-popup-position="outer"></span>';
+							<span class="ya-share2" data-services="', str_replace(' ', '', $modSettings['zen_yashare_services']), '"', $modSettings['zen_yashare'] == 'menu' ? ' data-limit="3"' : '', !empty($settings['og_image']) ? ' data-image="' . $settings['og_image'] . '"' : '', !empty($context['meta_description']) ? ' data-description="' . $context['meta_description'] . '"' : '', ' data-title="', $context['page_title'], '" data-url="', $scripturl, '?topic=', $context['current_topic'], '.0" data-lang="', $txt['lang_dictionary'], '"', $modSettings['zen_yashare'] == 'menu' ? ' data-popup-position="outer"' : '', '></span>';
 	}
 
 	// Если тема популярна
