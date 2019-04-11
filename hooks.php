@@ -7,12 +7,10 @@ elseif(!defined('SMF'))
 
 if ((SMF == 'SSI') && !$user_info['is_admin'])
 	die('Admin privileges required.');
-	
+
 $hooks = array(
-	'integrate_pre_include'          => '$sourcedir/Subs-ZenBlock.php',
-	'integrate_menu_buttons'         => 'zen_preload',
-	'integrate_admin_areas'          => 'zen_admin_areas',
-	'integrate_modify_modifications' => 'zen_modifications',
+	'integrate_pre_include' => '$sourcedir/Class-ZenBlock.php',
+	'integrate_pre_load'    => 'ZenBlock::hooks'
 );
 
 if (!empty($context['uninstalling']))
@@ -22,8 +20,6 @@ else
 
 foreach ($hooks as $hook => $function)
 	$call($hook, $function);
-	
+
 if (SMF == 'SSI')
 	echo 'Database changes are complete! Please wait...';
-
-?>

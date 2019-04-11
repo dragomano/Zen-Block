@@ -7,10 +7,10 @@ function template_zen_above()
 	if (!empty($context['zen_block'])) {
 		echo '
 	<div id="zen"', $context['is_poll'] && empty($context['linked_calendar_events']) ? ' style="margin-top: 10px"' : (!empty($context['is_poll']) ? '' : ''), '>
-		<div', !empty($context['zen_attachments']) ? ' id="first_message"' : '', ' class="description">
+		<div class="description">
 			<div class="zen-head ', empty($modSettings['zen_block_status']) ? 'full' : 'mini', '_text information">', $txt['zen_block_enable'], '</div>
 			<div', empty($modSettings['zen_block_status']) ? ' class="zen-body"' : '', '>';
-						
+
 		if ($settings['name'] != 'ClearSky')
 			echo '
 				<span class="upperframe"><span></span></span>
@@ -18,7 +18,7 @@ function template_zen_above()
 		else
 			echo '
 				<div class="sky">';
-							
+
 		echo '
 					<div class="zen_message">', $context['zen_block'], '</div>
 					<hr />
@@ -33,93 +33,38 @@ function template_zen_above()
 						</span>
 					</div>
 				</div>';
-	
+
 		if ($settings['name'] != 'ClearSky')
 			echo '
 				<span class="lowerframe"><span></span></span>';
-							
-		echo '
-			</div>
-		</div>';
-					
-		if (!empty($context['zen_attachments']) && !empty($modSettings['zen_attach_block'])) {
-			echo '
-		<div id="zen_attach" class="description">
-			<div class="zen-head ', empty($modSettings['zen_block_status']) ? 'full' : 'mini', '_text information">', $txt['zen_attachments'], '</div>
-			<div class="', empty($modSettings['zen_block_status']) ? 'zen-body ' : '', 'smalltext">';
-						
-			if ($settings['name'] != 'ClearSky')
-				echo '
-				<span class="upperframe"><span></span></span>
-				<div class="roundframe">';
-			else
-				echo '
-				<div class="sky">';
 
-			echo '
-					<div class="zen_message">',	$context['zen_attachments'], '</div>
-				</div>';
-					
-			if ($settings['name'] != 'ClearSky')
-				echo '					
-				<span class="lowerframe"><span></span></span>';
-							
-			echo '
+		echo '
 			</div>
 		</div>
-		<br class="clear" />';
-		}
-		
-		echo '
 	</div>';
 	}
 }
 
 function template_zen_below()
 {
-	global $context, $modSettings, $settings, $scripturl, $txt, $topicinfo;
-	
+	global $context, $modSettings, $scripturl, $txt, $topicinfo;
+
 	if (!empty($context['zen_block'])) {
 		echo '
-	<script type="text/javascript">window.jQuery || document.write(unescape(\'%3Cscript src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"%3E%3C/script%3E\'))</script>';
-				
-		if (!empty($modSettings['zen_gplus']))
-			echo '
-	<script type="text/javascript">window.gapi || document.write(unescape(\'%3Cscript src="https://apis.google.com/js/plusone.js"%3E{"parsetags": "explicit", "lang": "' . $txt['lang_dictionary'] . '"}%3C/script%3E\'))</script>';
-	
-		if (!empty($modSettings['zen_yashare']))
-			echo '
-	<script type="text/javascript" src="//yandex.st/share/share.js" charset="utf-8"></script>';
-				
-		echo '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/jquery.zen.js"></script>
-	<script type="text/javascript">window.addEvent && document.write(unescape(\'%3Cscript type="text/javascript"%3EjQuery.noConflict();%3C/script%3E\'))</script>
-	<script type="text/javascript"><!-- // --><![CDATA[
-		jQuery(document).ready(function($){';
-
-		if (!empty($modSettings['zen_attach_block']) && !empty($modSettings['zen_img_preview']) && !empty($context['zen_attachments']))	{
-			foreach ($context['attachments'] as $attach) {
-				if ($attach['file']['is_image'])
-					echo '
-			$(\'a.imgTip' . $attach['file']['image']['id'] . '\').tinyTips(\'' . $context['tooltips'] . '\', \'<img alt="" src="' . $attach['file']['image']['href'] . '" />\');';
-			}
-		}
-
-		echo '
-			$(\'.zen-head\').click(function(){
-				$(this).toggleClass("full_text").toggleClass("mini_text").next().toggle();
+		<script type="text/javascript">window.jQuery || document.write(unescape(\'%3Cscript src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"%3E%3C/script%3E\'))</script>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			jQuery(document).ready(function($) {
+				$(".zen-head").click(function() {
+					$(this).toggleClass("full_text").toggleClass("mini_text").next().toggle();
+				})
 			})
-		})
-	// ]]></script>';
+		// ]]></script>';
 
-		if (!empty($modSettings['zen_gplus']) || !empty($modSettings['zen_yashare'])) {
+		if (!empty($modSettings['zen_yashare'])) {
 			echo '
+	<script type="text/javascript" src="//yandex.st/share/share.js" charset="utf-8"></script>
 	<script type="text/javascript"><!-- // --><![CDATA[';
-				
-			if (!empty($modSettings['zen_gplus']))
-				echo '
-		gapi.plusone.render("plusone-zen", {"size": "small", "href" : "' . $scripturl . '?topic=' . $context['current_topic'] . '.0"});';
-		
+
 			$services = '';
 			if (!empty($modSettings['zen_yashare_array'])) {
 				$temp = explode(",", $modSettings['zen_yashare_array']);
@@ -129,7 +74,7 @@ function template_zen_below()
 				}
 				$services = substr($services, 0, strlen($services) - 1);
 			}
-		
+
 			$blocks = '';
 			if (!empty($modSettings['zen_yashare_blocks']))	{
 				$temp = explode(",", $modSettings['zen_yashare_blocks']);
@@ -139,7 +84,7 @@ function template_zen_below()
 				}
 				$blocks = substr($blocks, 0, strlen($blocks) - 1);
 			}
-					
+
 			if (!empty($modSettings['zen_yashare']))
 				echo '
 		new Ya.share({
@@ -159,7 +104,7 @@ function template_zen_below()
 			}
 		})';
 
-			echo '	
+			echo '
 	// ]]></script>';
 		}
 	}
@@ -168,14 +113,14 @@ function template_zen_below()
 function template_callback_zen_ignored_boards()
 {
 	global $context;
-	
+
 	echo '
 		<dt></dt><dd></dd></dl>
 		<ul class="ignoreboards floatleft" style="margin-top: -30px">';
 
 	$i = 0;
 	$limit = ceil($context['num_boards'] / 2);
-	
+
 	foreach ($context['categories'] as $category) {
 		if ($i == $limit) {
 			echo '
@@ -218,5 +163,3 @@ function template_callback_zen_ignored_boards()
 		<br class="clear" />
 		<dl><dt></dt><dd></dd>';
 }
-
-?>

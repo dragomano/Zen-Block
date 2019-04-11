@@ -12,14 +12,6 @@
 	border: none;
 	padding: 0;
 }
-#first_message {
-	float: left;
-	width: 79.5%;
-}
-#zen_attach {
-	float: right;
-	width: 19.5%;
-}
 .darkTip .content {
 	padding: 1px;
 	border-radius: 5px;
@@ -76,7 +68,4 @@
 }
 .b-share .b-share-form-button, .b-share__text {
 	font-size: 1.2em !important;
-}
-#plusone-zen {
-	margin-top: 5px;
 }
