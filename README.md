@@ -1,7 +1,7 @@
 # Zen Block for SMF
 * **Author:** Bugo [dragomano.ru](https://dragomano.ru/mods/zen-block)
 * **License:** [Artistic License 2.0](https://opensource.org/licenses/artistic-license-2.0)
-* **Compatible with:** SMF 2.0.x
+* **Compatible with:** SMF 2.1.x
 * **Hooks only:** Yes
 * **Languages:** Russian, English
 

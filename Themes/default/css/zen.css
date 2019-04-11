@@ -12,21 +12,6 @@
 	border: none;
 	padding: 0;
 }
-.darkTip .content {
-	padding: 1px;
-	border-radius: 5px;
-}
-.darkTip .bottom {
-	height: 14px;
-}
-.darkTip .content {
-	border: 6px solid #303030;
-	background: #505050;
-	color: #f8f8f8;
-}
-.darkTip .bottom {
-	background: url(../images/zen/zen_dark.png) top center no-repeat;
-}
 .zen-head {
 	cursor: pointer;
 }
@@ -57,15 +42,9 @@
 	font-size: medium;
 	text-decoration: none;
 }
-.sky {
-	border: 1px solid #B7B7B7;
-	border-radius: 6px;
-	margin: 1px;
-	padding: 0.5em 1em;
+.ya-share2 {
+	float: left;
 }
-.b-share {
-	margin-top: -10px;
-}
-.b-share .b-share-form-button, .b-share__text {
-	font-size: 1.2em !important;
+.icon {
+	vertical-align: middle;
 }
