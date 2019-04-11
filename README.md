@@ -11,4 +11,4 @@ Small block that displays the content of the first post of each topic in its upp
 ## Описание
 Zen Block — небольшой блок, отображающий содержание самого первого сообщения каждой темы в её верхней части, с возможностью добавить понравившуюся тему в закладки.
 
-![Preview](https://dragomano.ru/images/1/0/9/5/9/109593e6b628ab3a8b16d877930b792d7964586a-zenblock.png)
+![Preview](https://dragomano.ru/mods/zen-block/zen_block_preview.png)
