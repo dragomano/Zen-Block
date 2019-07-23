@@ -3,30 +3,20 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>Bugo:ZenBlock</id>
 	<name>Zen Block</name>
-	<version>0.8.1</version>
+	<version>0.8.2</version>
 	<type>modification</type>
 
 	<install for="2.1 RC2, 2.1 - 2.1.99">
 		<readme parsebbc="true" lang="russian">readme/russian.txt</readme>
 		<readme parsebbc="true">readme/readme.txt</readme>
-		<hook hook="integrate_load_theme" function="ZenBlock::loadTheme" file="$sourcedir/Class-ZenBlock.php" />
-		<hook hook="integrate_menu_buttons" function="ZenBlock::menuButtons" file="$sourcedir/Class-ZenBlock.php" />
-		<hook hook="integrate_prepare_display_context" function="ZenBlock::prepareDisplayContext" file="$sourcedir/Class-ZenBlock.php" />
-		<hook hook="integrate_admin_areas" function="ZenBlock::adminAreas" file="$sourcedir/Class-ZenBlock.php" />
-		<hook hook="integrate_admin_search" function="ZenBlock::adminSearch" file="$sourcedir/Class-ZenBlock.php" />
-		<hook hook="integrate_modify_modifications" function="ZenBlock::modifyModifications" file="$sourcedir/Class-ZenBlock.php" />
+		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" />
 		<require-dir name="Sources" destination="$boarddir">Core files</require-dir>
 		<require-dir name="Themes" destination="$boarddir">Template &amp; Language files</require-dir>
 		<redirect url="?action=admin;area=modsettings;sa=zen" timeout="1000" />
 	</install>
 
 	<uninstall for="2.1 RC2, 2.1 - 2.1.99">
-		<hook hook="integrate_load_theme" function="ZenBlock::loadTheme" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
-		<hook hook="integrate_menu_buttons" function="ZenBlock::menuButtons" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
-		<hook hook="integrate_prepare_display_context" function="ZenBlock::prepareDisplayContext" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
-		<hook hook="integrate_admin_areas" function="ZenBlock::adminAreas" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
-		<hook hook="integrate_admin_search" function="ZenBlock::adminSearch" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
-		<hook hook="integrate_modify_modifications" function="ZenBlock::modifyModifications" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
+		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
 		<remove-file name="$themedir/css/zen.css" />
 		<remove-file name="$themedir/ZenBlock.template.php" />
 		<remove-file name="$sourcedir/Class-ZenBlock.php" />

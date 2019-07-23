@@ -9,7 +9,7 @@
  * @copyright 2011-2019 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 0.8.1
+ * @version 0.8.2
  */
 
 if (!defined('SMF'))
@@ -17,6 +17,21 @@ if (!defined('SMF'))
 
 class ZenBlock
 {
+	/**
+	 * Подключаем используемые хуки
+	 *
+	 * @return void
+	 */
+	public static function hooks()
+	{
+		add_integration_function('integrate_load_theme', 'ZenBlock::loadTheme', false, __FILE__);
+		add_integration_function('integrate_menu_buttons', 'ZenBlock::menuButtons', false, __FILE__);
+		add_integration_function('integrate_prepare_display_context', 'ZenBlock::prepareDisplayContext', false, __FILE__);
+		add_integration_function('integrate_admin_areas', 'ZenBlock::adminAreas', false, __FILE__);
+		add_integration_function('integrate_admin_search', 'ZenBlock::adminSearch', false, __FILE__);
+		add_integration_function('integrate_modify_modifications', 'ZenBlock::modifyModifications', false, __FILE__);
+	}
+
 	/**
 	 * Подключаем языковой файл
 	 *
