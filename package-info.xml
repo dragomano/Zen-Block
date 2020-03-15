@@ -3,19 +3,19 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>Bugo:ZenBlock</id>
 	<name>Zen Block</name>
-	<version>0.8.2</version>
+	<version>0.9</version>
 	<type>modification</type>
 
-	<install for="2.1 RC2, 2.1 - 2.1.99">
+	<install for="2.1.*">
 		<readme parsebbc="true" lang="russian">readme/russian.txt</readme>
-		<readme parsebbc="true">readme/readme.txt</readme>
+		<readme parsebbc="true" lang="english">readme/english.txt</readme>
 		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" />
 		<require-dir name="Sources" destination="$boarddir">Core files</require-dir>
 		<require-dir name="Themes" destination="$boarddir">Template &amp; Language files</require-dir>
 		<redirect url="?action=admin;area=modsettings;sa=zen" timeout="1000" />
 	</install>
 
-	<uninstall for="2.1 RC2, 2.1 - 2.1.99">
+	<uninstall for="2.1.*">
 		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
 		<remove-file name="$themedir/css/zen.css" />
 		<remove-file name="$themedir/ZenBlock.template.php" />

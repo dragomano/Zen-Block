@@ -6,10 +6,10 @@
  * @package Zen Block
  * @link https://dragomano.ru/mods/zen-block
  * @author Bugo <bugo@dragomano.ru>
- * @copyright 2011-2019 Bugo
+ * @copyright 2011-2020 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 0.8.2
+ * @version 0.9
  */
 
 if (!defined('SMF'))
@@ -24,12 +24,13 @@ class ZenBlock
 	 */
 	public static function hooks()
 	{
-		add_integration_function('integrate_load_theme', 'ZenBlock::loadTheme', false, __FILE__);
-		add_integration_function('integrate_menu_buttons', 'ZenBlock::menuButtons', false, __FILE__);
-		add_integration_function('integrate_prepare_display_context', 'ZenBlock::prepareDisplayContext', false, __FILE__);
-		add_integration_function('integrate_admin_areas', 'ZenBlock::adminAreas', false, __FILE__);
-		add_integration_function('integrate_admin_search', 'ZenBlock::adminSearch', false, __FILE__);
-		add_integration_function('integrate_modify_modifications', 'ZenBlock::modifyModifications', false, __FILE__);
+		add_integration_function('integrate_load_theme', __CLASS__ . '::loadTheme', false, __FILE__);
+		add_integration_function('integrate_menu_buttons', __CLASS__ . '::menuButtons', false, __FILE__);
+		add_integration_function('integrate_display_topic', __CLASS__ . '::displayTopic', false, __FILE__);
+		add_integration_function('integrate_prepare_display_context', __CLASS__ . '::prepareDisplayContext', false, __FILE__);
+		add_integration_function('integrate_admin_areas', __CLASS__ . '::adminAreas', false, __FILE__);
+		add_integration_function('integrate_admin_search', __CLASS__ . '::adminSearch', false, __FILE__);
+		add_integration_function('integrate_modify_modifications', __CLASS__ . '::modifyModifications', false, __FILE__);
 	}
 
 	/**
@@ -79,39 +80,26 @@ class ZenBlock
 	 *
 	 * @return void
 	 */
-	private static function showZenBlock()
+	private static function prepareZenBlock()
 	{
-		global $context, $smcFunc, $boarddir, $scripturl;
+		global $context;
 
 		if (($context['zen_block'] = cache_get_data('zen_block_' . $context['current_topic'], 3600)) == null) {
-			if (!empty($context['topicinfo']['topic_first_message'])) {
-				censorText($context['topicinfo']['topic_first_message']);
-				$context['zen_block'] = parse_bbc($context['topicinfo']['topic_first_message']);
-			} else {
-				$request = $smcFunc['db_query']('', '
-					SELECT body
-					FROM {db_prefix}messages
-					WHERE id_topic = {int:current_topic}
-						AND id_msg = {int:first_message}
-					LIMIT 1',
-					array(
-						'current_topic' => $context['current_topic'],
-						'first_message' => $context['topic_first_message']
-					)
-				);
-
-				while ($row = $smcFunc['db_fetch_assoc']($request)) {
-					censorText($row['body']);
-					$context['zen_block'] = parse_bbc($row['body']);
-				}
-
-				$smcFunc['db_free_result']($request);
-			}
-
+			censorText($context['topicinfo']['topic_first_message']);
+			$context['zen_block'] = parse_bbc($context['topicinfo']['topic_first_message']);
 			cache_put_data('zen_block_' . $context['current_topic'], $context['zen_block'], 3600);
 		}
+	}
 
-		// Check topic popularity
+	/**
+	 * Проверяем популярность темы
+	 *
+	 * @return void
+	 */
+	private static function checkTopicPopularity()
+	{
+		global $context, $boarddir, $scripturl;
+
 		$context['top_topic'] = false;
 
 		if (!is_file($boarddir . '/SSI.php'))
@@ -128,21 +116,37 @@ class ZenBlock
 	}
 
 	/**
-	 * Отображение дзен-блока
+	 * Получаем дополнительные данные при выборке сообщений темы
 	 *
-	 * @param array $output массив с параметрами исходного сообщения
+	 * @param array $topic_selects
 	 * @return void
 	 */
-	public static function prepareDisplayContext(&$output, &$message, $counter)
+	public static function displayTopic(&$topic_selects)
 	{
-		global $context, $modSettings;
+		global $modSettings;
 
-		if ($counter % $modSettings['defaultMaxMessages'] != 1 || empty($modSettings['zen_block_enable']))
+		if (empty($modSettings['zen_block_enable']) || in_array('ms.body AS topic_first_message', $topic_selects))
 			return;
 
-		if ($modSettings['zen_block_enable'] == 1 ? $output['id'] != $context['topic_first_message'] : $modSettings['zen_block_enable'] == 2) {
-			self::showZenBlock();
+		$topic_selects[] = 'ms.body AS topic_first_message';
+	}
 
+	/**
+	 * Отображение дзен-блока
+	 *
+	 * @param array $output
+	 * @return void
+	 */
+	public static function prepareDisplayContext(&$output)
+	{
+		global $modSettings, $context;
+
+		if (empty($modSettings['zen_block_enable']))
+			return;
+
+		if ($modSettings['zen_block_enable'] == 1 ? $output['id'] != $context['topic_first_message'] : $output['counter'] == $context['start']) {
+			self::prepareZenBlock();
+			self::checkTopicPopularity();
 			loadTemplate('ZenBlock');
 			show_zen_block();
 		}
@@ -171,7 +175,7 @@ class ZenBlock
 	 */
 	public static function adminSearch(&$language_files, &$include_files, &$settings_search)
 	{
-		$settings_search[] = array('ZenBlock::settings', 'area=modsettings;sa=zen');
+		$settings_search[] = array(__CLASS__ . '::settings', 'area=modsettings;sa=zen');
 	}
 
 	/**
@@ -182,7 +186,7 @@ class ZenBlock
 	 */
 	public static function modifyModifications(&$subActions)
 	{
-		$subActions['zen'] = array('ZenBlock', 'settings');
+		$subActions['zen'] = array(__CLASS__, 'settings');
 	}
 
 	/**
