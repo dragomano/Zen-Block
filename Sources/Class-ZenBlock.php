@@ -6,10 +6,10 @@
  * @package Zen Block
  * @link https://dragomano.ru/mods/zen-block
  * @author Bugo <bugo@dragomano.ru>
- * @copyright 2011-2019 Bugo
+ * @copyright 2011-2020 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 0.8
+ * @version 0.9
  */
 
 if (!defined('SMF'))
@@ -17,19 +17,34 @@ if (!defined('SMF'))
 
 class ZenBlock
 {
+	/**
+	 * Подключаем используемые хуки
+	 *
+	 * @return void
+	 */
 	public static function hooks()
 	{
-		add_integration_function('integrate_load_theme', 'ZenBlock::loadTheme', false);
-		add_integration_function('integrate_menu_buttons', 'ZenBlock::menuButtons', false);
-		add_integration_function('integrate_admin_areas', 'ZenBlock::adminAreas', false);
-		add_integration_function('integrate_modify_modifications', 'ZenBlock::modifyModifications', false);
+		add_integration_function('integrate_load_theme', __CLASS__ . '::loadTheme', false);
+		add_integration_function('integrate_menu_buttons', __CLASS__ . '::menuButtons', false);
+		add_integration_function('integrate_admin_areas', __CLASS__ . '::adminAreas', false);
+		add_integration_function('integrate_modify_modifications', __CLASS__ . '::modifyModifications', false);
 	}
 
+	/**
+	 * Подключаем языковой файл
+	 *
+	 * @return void
+	 */
 	public static function loadTheme()
 	{
 		loadLanguage('ZenBlock/');
 	}
 
+	/**
+	 * Вызываем функцию отображения блока с первым сообщением темы
+	 *
+	 * @return void
+	 */
 	public static function menuButtons()
 	{
 		global $modSettings, $context;
@@ -54,6 +69,11 @@ class ZenBlock
 		}
 	}
 
+	/**
+	 * Отображение блока с первым сообщением темы
+	 *
+	 * @return void
+	 */
 	private static function showZenBlock()
 	{
 		global $context, $smcFunc, $boarddir, $scripturl, $modSettings, $settings;
@@ -84,7 +104,7 @@ class ZenBlock
 			cache_put_data('zen_block_' . $context['current_topic'], $context['zen_block'], 3600);
 		}
 
-		// Check topic popularity
+		// Определяем, популярна ли тема
 		$context['top_topic'] = false;
 
 		if (!file_exists($boarddir . '/SSI.php'))
@@ -100,6 +120,12 @@ class ZenBlock
 		}
 	}
 
+	/**
+	 * Определяем название вкладки с настройками мода в админке
+	 *
+	 * @param array $admin_areas
+	 * @return void
+	 */
 	public static function adminAreas(&$admin_areas)
 	{
 		global $txt;
@@ -107,11 +133,22 @@ class ZenBlock
 		$admin_areas['config']['areas']['modsettings']['subsections']['zen'] = array($txt['zen_settings']);
 	}
 
+	/**
+	 * Подключаем настройки мода
+	 *
+	 * @param array $subActions
+	 * @return void
+	 */
 	public static function modifyModifications(&$subActions)
 	{
 		$subActions['zen'] = array('ZenBlock', 'settings');
 	}
 
+	/**
+	 * Определяем настройки мода
+	 *
+	 * @return void
+	 */
 	public static function settings()
 	{
 		global $txt, $context, $scripturl, $modSettings;
@@ -142,7 +179,7 @@ class ZenBlock
 
 		$config_vars[] = array('title', 'zen_ignored_boards');
 		$config_vars[] = array('desc', 'zen_ignored_boards_desc');
-		$config_vars[] = array('callback', 'zen_ignored_boards');
+		$config_vars[] = array('callback', 'setting_zen_ignored_boards');
 
 		// Saving?
 		if (isset($_GET['save'])) {
@@ -174,6 +211,11 @@ class ZenBlock
 		prepareDBSettingContext($config_vars);
 	}
 
+	/**
+	 * Получаем игнорируемые разделы
+	 *
+	 * @return void
+	 */
 	private static function ignoreBoards()
 	{
 		global $smcFunc, $modSettings, $context;

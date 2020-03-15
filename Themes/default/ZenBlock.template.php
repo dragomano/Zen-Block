@@ -110,7 +110,7 @@ function template_zen_below()
 	}
 }
 
-function template_callback_zen_ignored_boards()
+function template_callback_setting_zen_ignored_boards()
 {
 	global $context;
 
