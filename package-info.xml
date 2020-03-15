@@ -6,18 +6,17 @@
 	<version>0.9</version>
 	<type>modification</type>
 
-	<install for="2.0 - 2.0.99">
-		<readme parsebbc="true" lang="russian-utf8">readme/russian-utf8.txt</readme>
+	<install for="2.1.*">
 		<readme parsebbc="true" lang="russian">readme/russian.txt</readme>
-		<readme parsebbc="true">readme/readme.txt</readme>
+		<readme parsebbc="true" lang="english">readme/english.txt</readme>
+		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" />
 		<require-dir name="Sources" destination="$boarddir">Core files</require-dir>
 		<require-dir name="Themes" destination="$boarddir">Template &amp; Language files</require-dir>
-		<code>hooks.php</code>
 		<redirect url="?action=admin;area=modsettings;sa=zen" timeout="1000" />
 	</install>
 
-	<uninstall for="2.0 - 2.0.99">
-		<code>hooks.php</code>
+	<uninstall for="2.1.*">
+		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
 		<remove-file name="$themedir/css/zen.css" />
 		<remove-file name="$themedir/ZenBlock.template.php" />
 		<remove-file name="$sourcedir/Class-ZenBlock.php" />

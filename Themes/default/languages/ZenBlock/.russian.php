@@ -1,20 +1,18 @@
 <?php
 
-$txt['zen_settings'] = 'Zen Block';
-$txt['zen_desc'] = 'Здесь можно изменить настройки блока с содержанием первого сообщения.';
-$txt['zen_block_enable'] = 'Блок с содержанием первого сообщения';
-$txt['zen_block_status'] = 'Состояние по умолчанию';
-$txt['zen_block_status_set'] = array('Свёрнутое', 'Развёрнутое');
-$txt['zen_block_link'] = 'Ссылка';
-$txt['zen_block_topic'] = 'Тема популярна';
-$txt['zen_share_title'] = 'Поделиться';
-$txt['zen_where_is'] = array('Отключить', 'Не показывать на первых страницах тем', 'Показывать на всех страницах тем');
-$txt['zen_ignored_boards'] = 'Игнорируемые разделы';
-$txt['zen_ignored_boards_desc'] = 'Перечислите id разделов, в которых Zen Block не должен отображаться.';
-$txt['zen_yashare'] = 'Показывать кнопку-ссылку «Поделиться» от Яндекса <div class="smalltext">Укажите, отображать ли эту штуку и в каком виде.</div>';
-$txt['zen_yashare_set'] = array(0 => 'Нет', 'button' => 'В виде кнопки', 'link' => 'В виде ссылки', 'icon' => 'Иконки и меню', 'none' => 'Только иконки');
-$txt['zen_yashare_title'] = 'Настройка блока &laquo;Поделиться&raquo; от Яндекса';
-$txt['zen_yashare_blocks'] = 'Иконки в блоке <div class="smalltext">Через запятую.</div>';
-$txt['zen_yashare_array'] = 'Отображаемые сбоку иконки <div class="smalltext">Через запятую.</div>';
-$txt['zen_yashare_icons'] = 'blogger, digg, evernote, delicious, diary, facebook, friendfeed, gplus, juick, liveinternet, linkedin, lj, moikrug, moimir, myspace, odnoklassniki, tutby, twitter, vkontakte, yaru, yazakladki, surfingbird';
-$txt['zen_yashare_desc'] = 'Поддерживаемые сервисы: ' . $txt['zen_yashare_icons'];
+$txt['zen_settings']             = 'Zen Block';
+$txt['zen_desc']                 = 'Р—РґРµСЃСЊ РјРѕР¶РЅРѕ РёР·РјРµРЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё Р±Р»РѕРєР° СЃ СЃРѕРґРµСЂР¶Р°РЅРёРµРј РїРµСЂРІРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ.';
+$txt['zen_block_enable']         = 'Р‘Р»РѕРє СЃ СЃРѕРґРµСЂР¶Р°РЅРёРµРј РїРµСЂРІРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ';
+$txt['zen_block_status']         = 'РЎРѕСЃС‚РѕСЏРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ';
+$txt['zen_block_status_set']     = array('РЎРІС‘СЂРЅСѓС‚РѕРµ', 'Р Р°Р·РІС‘СЂРЅСѓС‚РѕРµ');
+$txt['zen_block_link']           = 'РЎСЃС‹Р»РєР°';
+$txt['zen_block_topic']          = 'РўРµРјР° РїРѕРїСѓР»СЏСЂРЅР°';
+$txt['zen_where_is']             = array('РћС‚РєР»СЋС‡РёС‚СЊ', 'РќРµ РїРѕРєР°Р·С‹РІР°С‚СЊ РЅР° РїРµСЂРІС‹С… СЃС‚СЂР°РЅРёС†Р°С… С‚РµРј', 'РџРѕРєР°Р·С‹РІР°С‚СЊ РЅР° РІСЃРµС… СЃС‚СЂР°РЅРёС†Р°С… С‚РµРј');
+$txt['zen_ignored_boards']       = 'РРіРЅРѕСЂРёСЂСѓРµРјС‹Рµ СЂР°Р·РґРµР»С‹';
+$txt['zen_ignored_boards_desc']  = 'РћС‚РјРµС‚СЊС‚Рµ СЂР°Р·РґРµР»С‹, РІ РєРѕС‚РѕСЂС‹С… Zen Block РќР• РґРѕР»Р¶РµРЅ РѕС‚РѕР±СЂР°Р¶Р°С‚СЊСЃСЏ';
+$txt['zen_yashare']              = 'РџРѕРєР°Р·С‹РІР°С‚СЊ Р±Р»РѕРє В«РџРѕРґРµР»РёС‚СЊСЃСЏВ» РѕС‚ РЇРЅРґРµРєСЃР° <div class="smalltext">РЈРєР°Р¶РёС‚Рµ, РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ Р»Рё СЌС‚Сѓ С€С‚СѓРєСѓ Рё РІ РєР°РєРѕРј РІРёРґРµ.</div>';
+$txt['zen_yashare_set']          = array(0 => 'РќРµС‚', 'icons' => 'РўРѕР»СЊРєРѕ РёРєРѕРЅРєРё', 'menu' => 'РРєРѕРЅРєРё Рё РјРµРЅСЋ');
+$txt['zen_yashare_title']        = 'РќР°СЃС‚СЂРѕР№РєР° Р±Р»РѕРєР° &laquo;РџРѕРґРµР»РёС‚СЊСЃСЏ&raquo; РѕС‚ РЇРЅРґРµРєСЃР°';
+$txt['zen_yashare_services']     = 'РћС‚РѕР±СЂР°Р¶Р°РµРјС‹Рµ РёРєРѕРЅРєРё <div class="smalltext">Р§РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ.</div>';
+$txt['zen_yashare_services_set'] = 'collections, vkontakte, facebook, odnoklassniki, moimir, twitter, blogger, delicious, digg, reddit, evernote, linkedin, lj, pocket, qzone, renren, sinaWeibo, surfingbird, tencentWeibo, tumblr, viber, whatsapp, skype, telegram';
+$txt['zen_yashare_desc']         = 'РџРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ СЃРµСЂРІРёСЃС‹: ' . $txt['zen_yashare_services_set'];

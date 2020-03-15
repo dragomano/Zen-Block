@@ -24,10 +24,13 @@ class ZenBlock
 	 */
 	public static function hooks()
 	{
-		add_integration_function('integrate_load_theme', __CLASS__ . '::loadTheme', false);
-		add_integration_function('integrate_menu_buttons', __CLASS__ . '::menuButtons', false);
-		add_integration_function('integrate_admin_areas', __CLASS__ . '::adminAreas', false);
-		add_integration_function('integrate_modify_modifications', __CLASS__ . '::modifyModifications', false);
+		add_integration_function('integrate_load_theme', __CLASS__ . '::loadTheme', false, __FILE__);
+		add_integration_function('integrate_menu_buttons', __CLASS__ . '::menuButtons', false, __FILE__);
+		add_integration_function('integrate_display_topic', __CLASS__ . '::displayTopic', false, __FILE__);
+		add_integration_function('integrate_prepare_display_context', __CLASS__ . '::prepareDisplayContext', false, __FILE__);
+		add_integration_function('integrate_admin_areas', __CLASS__ . '::adminAreas', false, __FILE__);
+		add_integration_function('integrate_admin_search', __CLASS__ . '::adminSearch', false, __FILE__);
+		add_integration_function('integrate_modify_modifications', __CLASS__ . '::modifyModifications', false, __FILE__);
 	}
 
 	/**
@@ -41,7 +44,7 @@ class ZenBlock
 	}
 
 	/**
-	 * Вызываем функцию отображения блока с первым сообщением темы
+	 * Подключаем используемые стили и скрипты, а также вызываем необходимые функции
 	 *
 	 * @return void
 	 */
@@ -57,57 +60,49 @@ class ZenBlock
 		if (!empty($modSettings['zen_ignored_boards']))
 			$ignored_boards = explode(",", $modSettings['zen_ignored_boards']);
 
-		if (in_array($context['current_board'], $ignored_boards))
+		if (in_array($context['current_board'], $ignored_boards)) {
+			$modSettings['zen_block_enable'] = false;
 			return;
+		}
 
-		if (!empty($context['current_topic']) && isset($context['topic_first_message'])) {
-			if (empty($modSettings['zen_block_enable']))
-				return;
+		loadCSSFile('zen.css');
 
-			if ($modSettings['zen_block_enable'] == 1 ? $context['first_message'] != $context['topic_first_message'] : $modSettings['zen_block_enable'] == 2)
-				self::showZenBlock();
+		addInlineJavaScript('
+		jQuery(document).ready(function($) {
+			$(".zen-head").on("click", function() {
+				$(this).toggleClass("full_text").toggleClass("mini_text").next().toggle();
+			});
+		});', true);
+	}
+
+	/**
+	 * Получаем содержание первого сообщения
+	 *
+	 * @return void
+	 */
+	private static function prepareZenBlock()
+	{
+		global $context;
+
+		if (($context['zen_block'] = cache_get_data('zen_block_' . $context['current_topic'], 3600)) == null) {
+			censorText($context['topicinfo']['topic_first_message']);
+			$context['zen_block'] = parse_bbc($context['topicinfo']['topic_first_message']);
+			cache_put_data('zen_block_' . $context['current_topic'], $context['zen_block'], 3600);
 		}
 	}
 
 	/**
-	 * Отображение блока с первым сообщением темы
+	 * Проверяем популярность темы
 	 *
 	 * @return void
 	 */
-	private static function showZenBlock()
+	private static function checkTopicPopularity()
 	{
-		global $context, $smcFunc, $boarddir, $scripturl, $modSettings, $settings;
+		global $context, $boarddir, $scripturl;
 
-		loadTemplate('ZenBlock', 'zen');
-		$context['template_layers'][] = 'zen';
-
-		if (($context['zen_block'] = cache_get_data('zen_block_' . $context['current_topic'], 3600)) == null) {
-			$request = $smcFunc['db_query']('', '
-				SELECT body
-				FROM {db_prefix}messages
-				WHERE id_topic = {int:current_topic}
-					AND id_msg = {int:first_message}
-				LIMIT 1',
-				array(
-					'current_topic' => $context['current_topic'],
-					'first_message' => $context['topic_first_message']
-				)
-			);
-
-			while ($row = $smcFunc['db_fetch_assoc']($request)) {
-				censorText($row['body']);
-				$context['zen_block'] = parse_bbc($row['body']);
-			}
-
-			$smcFunc['db_free_result']($request);
-
-			cache_put_data('zen_block_' . $context['current_topic'], $context['zen_block'], 3600);
-		}
-
-		// Определяем, популярна ли тема
 		$context['top_topic'] = false;
 
-		if (!file_exists($boarddir . '/SSI.php'))
+		if (!is_file($boarddir . '/SSI.php'))
 			return;
 
 		require_once($boarddir . '/SSI.php');
@@ -121,7 +116,44 @@ class ZenBlock
 	}
 
 	/**
-	 * Определяем название вкладки с настройками мода в админке
+	 * Получаем дополнительные данные при выборке сообщений темы
+	 *
+	 * @param array $topic_selects
+	 * @return void
+	 */
+	public static function displayTopic(&$topic_selects)
+	{
+		global $modSettings;
+
+		if (empty($modSettings['zen_block_enable']) || in_array('ms.body AS topic_first_message', $topic_selects))
+			return;
+
+		$topic_selects[] = 'ms.body AS topic_first_message';
+	}
+
+	/**
+	 * Отображение дзен-блока
+	 *
+	 * @param array $output
+	 * @return void
+	 */
+	public static function prepareDisplayContext(&$output)
+	{
+		global $modSettings, $context;
+
+		if (empty($modSettings['zen_block_enable']))
+			return;
+
+		if ($modSettings['zen_block_enable'] == 1 ? $output['id'] != $context['topic_first_message'] : $output['counter'] == $context['start']) {
+			self::prepareZenBlock();
+			self::checkTopicPopularity();
+			loadTemplate('ZenBlock');
+			show_zen_block();
+		}
+	}
+
+	/**
+	 * Добавляем секцию с названием мода в раздел настроек
 	 *
 	 * @param array $admin_areas
 	 * @return void
@@ -134,6 +166,19 @@ class ZenBlock
 	}
 
 	/**
+	 * Легкий доступ к настройкам мода через быстрый поиск в админке
+	 *
+	 * @param array $language_files
+	 * @param array $include_files
+	 * @param array $settings_search
+	 * @return void
+	 */
+	public static function adminSearch(&$language_files, &$include_files, &$settings_search)
+	{
+		$settings_search[] = array(__CLASS__ . '::settings', 'area=modsettings;sa=zen');
+	}
+
+	/**
 	 * Подключаем настройки мода
 	 *
 	 * @param array $subActions
@@ -141,141 +186,53 @@ class ZenBlock
 	 */
 	public static function modifyModifications(&$subActions)
 	{
-		$subActions['zen'] = array('ZenBlock', 'settings');
+		$subActions['zen'] = array(__CLASS__, 'settings');
 	}
 
 	/**
 	 * Определяем настройки мода
 	 *
-	 * @return void
+	 * @param boolean $return_config
+	 * @return array|void
 	 */
-	public static function settings()
+	public static function settings($return_config = false)
 	{
-		global $txt, $context, $scripturl, $modSettings;
-
-		loadTemplate('ZenBlock');
+		global $context, $txt, $scripturl, $modSettings;
 
 		$context['page_title'] = $context['settings_title'] = $txt['zen_settings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=modsettings;save;sa=zen';
 		$context[$context['admin_menu_name']]['tab_data']['tabs']['zen'] = array('description' => $txt['zen_desc']);
 
-		if (!isset($modSettings['zen_yashare_blocks']))
-			updateSettings(array('zen_yashare_blocks' => $txt['zen_yashare_icons']));
+		if (!isset($modSettings['zen_yashare_services']))
+			updateSettings(array('zen_yashare_services' => $txt['zen_yashare_services_set']));
 
-		self::ignoreBoards();
+		$txt['select_boards_from_list'] = $txt['zen_ignored_boards_desc'];
 
 		$config_vars = array(
 			array('select', 'zen_block_enable', $txt['zen_where_is']),
 			array('select', 'zen_block_status', $txt['zen_block_status_set']),
+			array('boards', 'zen_ignored_boards'),
 			array('select', 'zen_yashare', $txt['zen_yashare_set'])
 		);
 
 		if (!empty($modSettings['zen_yashare'])) {
 			$config_vars[] = array('title', 'zen_yashare_title');
 			$config_vars[] = array('desc', 'zen_yashare_desc');
-			$config_vars[] = array('large_text', 'zen_yashare_blocks', '" style="width:80%');
-			$config_vars[] = array('large_text', 'zen_yashare_array', '" style="width:80%');
+			$config_vars[] = array('large_text', 'zen_yashare_services', '" style="width:80%');
 		}
 
-		$config_vars[] = array('title', 'zen_ignored_boards');
-		$config_vars[] = array('desc', 'zen_ignored_boards_desc');
-		$config_vars[] = array('callback', 'setting_zen_ignored_boards');
+		if ($return_config)
+			return $config_vars;
 
 		// Saving?
 		if (isset($_GET['save'])) {
-			if (empty($_POST['ignore_brd']))
-				$_POST['ignore_brd'] = array();
-
-			unset($_POST['ignore_boards']);
-			if (isset($_POST['ignore_brd'])) {
-				if (!is_array($_POST['ignore_brd']))
-					$_POST['ignore_brd'] = array($_POST['ignore_brd']);
-
-				foreach ($_POST['ignore_brd'] as $k => $d) {
-					$d = (int) $d;
-					if ($d != 0)
-						$_POST['ignore_brd'][$k] = $d;
-					else
-						unset($_POST['ignore_brd'][$k]);
-				}
-				$_POST['ignore_boards'] = implode(',', $_POST['ignore_brd']);
-				unset($_POST['ignore_brd']);
-			}
-
 			checkSession();
-			saveDBSettings($config_vars);
-			updateSettings(array('zen_ignored_boards' => $_POST['ignore_boards']));
+			$save_vars = $config_vars;
+			saveDBSettings($save_vars);
+			clean_cache();
 			redirectexit('action=admin;area=modsettings;sa=zen');
 		}
 
 		prepareDBSettingContext($config_vars);
-	}
-
-	/**
-	 * Получаем игнорируемые разделы
-	 *
-	 * @return void
-	 */
-	private static function ignoreBoards()
-	{
-		global $smcFunc, $modSettings, $context;
-
-		$request = $smcFunc['db_query']('order_by_board_order', '
-			SELECT b.id_cat, c.name AS cat_name, b.id_board, b.name, b.child_level,
-				'. (!empty($modSettings['zen_ignore_boards']) ? 'b.id_board IN ({array_int:ignore_boards})' : '0') . ' AS is_ignored
-			FROM {db_prefix}boards AS b
-				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-			WHERE redirect = {string:empty_string}' . (!empty($modSettings['recycle_board']) ? '
-				AND b.id_board != {int:recycle_board}' : ''),
-			array(
-				'ignore_boards' => !empty($modSettings['zen_ignore_boards']) ? explode(',', $modSettings['zen_ignore_boards']) : array(),
-				'recycle_board' => !empty($modSettings['recycle_board']) ? $modSettings['recycle_board'] : null,
-				'empty_string'  => ''
-			)
-		);
-
-		$context['num_boards'] = $smcFunc['db_num_rows']($request);
-		$context['categories'] = array();
-
-		while ($row = $smcFunc['db_fetch_assoc']($request))	{
-			if (!isset($context['categories'][$row['id_cat']]))
-				$context['categories'][$row['id_cat']] = array(
-					'id'     => $row['id_cat'],
-					'name'   => $row['cat_name'],
-					'boards' => array()
-				);
-
-			$context['categories'][$row['id_cat']]['boards'][$row['id_board']] = array(
-				'id'          => $row['id_board'],
-				'name'        => $row['name'],
-				'child_level' => $row['child_level'],
-				'selected'    => $row['is_ignored']
-			);
-		}
-		$smcFunc['db_free_result']($request);
-
-		$temp_boards = array();
-		foreach ($context['categories'] as $category) {
-			$context['categories'][$category['id']]['child_ids'] = array_keys($category['boards']);
-
-			$temp_boards[] = array(
-				'name'      => $category['name'],
-				'child_ids' => array_keys($category['boards'])
-			);
-			$temp_boards = array_merge($temp_boards, array_values($category['boards']));
-		}
-
-		$max_boards = ceil(count($temp_boards) / 2);
-		if ($max_boards == 1)
-			$max_boards = 2;
-
-		$context['board_columns'] = array();
-		for ($i = 0; $i < $max_boards; $i++) {
-			$context['board_columns'][] = $temp_boards[$i];
-			if (isset($temp_boards[$i + $max_boards]))
-				$context['board_columns'][] = $temp_boards[$i + $max_boards];
-			else
-				$context['board_columns'][] = array();
-		}
 	}
 }
