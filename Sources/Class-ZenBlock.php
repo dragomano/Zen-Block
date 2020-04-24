@@ -9,7 +9,7 @@
  * @copyright 2011-2020 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 0.9
+ * @version 0.9.1
  */
 
 if (!defined('SMF'))
@@ -105,13 +105,18 @@ class ZenBlock
 		if (!is_file($boarddir . '/SSI.php'))
 			return;
 
-		require_once($boarddir . '/SSI.php');
-		$link = $scripturl . '?topic=' . $context['current_topic'] . '.0';
-		$topics = ssi_topTopicsReplies(1, null, 'array');
+		if (($topics = cache_get_data('zen_block_popular_topics', 3600)) == null) {
+			require_once($boarddir . '/SSI.php');
+			$link = $scripturl . '?topic=' . $context['current_topic'] . '.0';
+			$topics = ssi_topTopicsReplies(10, 'array');
+			cache_put_data('zen_block_popular_topics', $topics, 3600);
+		}
 
 		foreach ($topics as $topic) {
-			if ($link == $topic['href'])
+			if ($context['current_topic'] == $topic['id']) {
 				$context['top_topic'] = true;
+				break;
+			}
 		}
 	}
 
@@ -144,7 +149,7 @@ class ZenBlock
 		if (empty($modSettings['zen_block_enable']))
 			return;
 
-		if ($modSettings['zen_block_enable'] == 1 ? $output['id'] != $context['topic_first_message'] : $output['counter'] == $context['start']) {
+		if ($modSettings['zen_block_enable'] == 1 ? $output['counter'] == $context['start'] && !empty($output['counter']) : $output['counter'] == $context['start']) {
 			self::prepareZenBlock();
 			self::checkTopicPopularity();
 			loadTemplate('ZenBlock');
