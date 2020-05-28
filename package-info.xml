@@ -9,9 +9,9 @@
 	<install for="2.1.*">
 		<readme parsebbc="true" lang="russian">readme/russian.txt</readme>
 		<readme parsebbc="true" lang="english">readme/english.txt</readme>
-		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" />
 		<require-dir name="Sources" destination="$boarddir">Core files</require-dir>
 		<require-dir name="Themes" destination="$boarddir">Template &amp; Language files</require-dir>
+		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" />
 		<redirect url="?action=admin;area=modsettings;sa=zen" timeout="1000" />
 	</install>
 
