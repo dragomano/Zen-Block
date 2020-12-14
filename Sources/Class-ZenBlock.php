@@ -9,7 +9,7 @@
  * @copyright 2011-2020 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 0.9
+ * @version 1.0
  */
 
 if (!defined('SMF'))
@@ -47,7 +47,7 @@ class ZenBlock
 	 */
 	public static function menuButtons()
 	{
-		global $modSettings, $context;
+		global $modSettings, $context, $options;
 
 		if (empty($modSettings['zen_block_enable']) || empty($context['current_board']))
 			return;
@@ -64,8 +64,8 @@ class ZenBlock
 			if (empty($modSettings['zen_block_enable']))
 				return;
 
-			if ($modSettings['zen_block_enable'] == 1 ? $context['first_message'] != $context['topic_first_message'] : $modSettings['zen_block_enable'] == 2)
-				self::showZenBlock();
+			if ($modSettings['zen_block_enable'] == 1 ? $context['first_message'] != (empty($options['view_newest_first']) ? $context['topic_first_message'] : $context['topic_last_message']) : true)
+				self::show();
 		}
 	}
 
@@ -74,7 +74,7 @@ class ZenBlock
 	 *
 	 * @return void
 	 */
-	private static function showZenBlock()
+	private static function show()
 	{
 		global $context, $smcFunc, $boarddir, $scripturl, $modSettings, $settings;
 
@@ -141,7 +141,7 @@ class ZenBlock
 	 */
 	public static function modifyModifications(&$subActions)
 	{
-		$subActions['zen'] = array('ZenBlock', 'settings');
+		$subActions['zen'] = array(__CLASS__, 'settings');
 	}
 
 	/**
@@ -159,22 +159,35 @@ class ZenBlock
 		$context['post_url'] = $scripturl . '?action=admin;area=modsettings;save;sa=zen';
 		$context[$context['admin_menu_name']]['tab_data']['tabs']['zen'] = array('description' => $txt['zen_desc']);
 
-		if (!isset($modSettings['zen_yashare_blocks']))
-			updateSettings(array('zen_yashare_blocks' => $txt['zen_yashare_icons']));
+		$addSettings = array();
+		if (!isset($modSettings['zen_yashare_services']))
+			$addSettings['zen_yashare_services'] = $txt['zen_yashare_services_def'];
+		if (!isset($modSettings['zen_yashare_limit']))
+			$addSettings['zen_yashare_limit'] = 3;
+		if (!isset($modSettings['zen_yashare_shape']))
+			$addSettings['zen_yashare_shape'] = 'normal';
+		if (!isset($modSettings['zen_yashare_size']))
+			$addSettings['zen_yashare_size'] = 'm';
+
+		if (!empty($addSettings))
+			updateSettings($addSettings);
 
 		self::ignoreBoards();
 
 		$config_vars = array(
 			array('select', 'zen_block_enable', $txt['zen_where_is']),
 			array('select', 'zen_block_status', $txt['zen_block_status_set']),
-			array('select', 'zen_yashare', $txt['zen_yashare_set'])
+			array('check', 'zen_yashare')
 		);
 
 		if (!empty($modSettings['zen_yashare'])) {
 			$config_vars[] = array('title', 'zen_yashare_title');
 			$config_vars[] = array('desc', 'zen_yashare_desc');
-			$config_vars[] = array('large_text', 'zen_yashare_blocks', '" style="width:80%');
-			$config_vars[] = array('large_text', 'zen_yashare_array', '" style="width:80%');
+			$config_vars[] = array('large_text', 'zen_yashare_services', '" style="width:80%');
+			$config_vars[] = array('select', 'zen_yashare_color_scheme', $txt['zen_yashare_color_scheme_set']);
+			$config_vars[] = array('int', 'zen_yashare_limit');
+			$config_vars[] = array('select', 'zen_yashare_shape', $txt['zen_yashare_shape_set']);
+			$config_vars[] = array('select', 'zen_yashare_size', $txt['zen_yashare_size_set']);
 		}
 
 		$config_vars[] = array('title', 'zen_ignored_boards');
@@ -183,6 +196,8 @@ class ZenBlock
 
 		// Saving?
 		if (isset($_GET['save'])) {
+			checkSession();
+
 			if (empty($_POST['ignore_brd']))
 				$_POST['ignore_brd'] = array();
 
@@ -202,7 +217,6 @@ class ZenBlock
 				unset($_POST['ignore_brd']);
 			}
 
-			checkSession();
 			saveDBSettings($config_vars);
 			updateSettings(array('zen_ignored_boards' => $_POST['ignore_boards']));
 			redirectexit('action=admin;area=modsettings;sa=zen');

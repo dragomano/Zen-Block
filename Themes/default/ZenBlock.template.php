@@ -11,32 +11,50 @@ function template_zen_above()
 			<div class="zen-head ', empty($modSettings['zen_block_status']) ? 'full' : 'mini', '_text information">', $txt['zen_block_enable'], '</div>
 			<div', empty($modSettings['zen_block_status']) ? ' class="zen-body"' : '', '>';
 
-		if ($settings['name'] != 'ClearSky')
+		if ($settings['name'] != 'ClearSky') {
 			echo '
 				<span class="upperframe"><span></span></span>
 				<div class="roundframe">';
-		else
+		} else {
 			echo '
 				<div class="sky">';
+		}
 
 		echo '
 					<div class="zen_message">', $context['zen_block'], '</div>
 					<hr />
 					<div class="smalltext">
 						<span class="zen_symbol lefttext">&#31146;</span>
-						<span class="floatright">',
-							!empty($modSettings['zen_yashare']) ? '<span id="yashare-zen"' . ($modSettings['zen_yashare'] == 'icon' ? ' title="' . $txt['zen_share_title'] . '"' : '') . '></span>' : '',
-							!empty($modSettings['zen_gplus']) ? '<span id="plusone-zen"></span>' : '',
-							$context['top_topic'] ? '<img src="' . $settings['default_images_url'] . '/zen/zen_pop.png" alt="' . $txt['zen_block_topic'] . '" title="' . $txt['zen_block_topic'] . '" />&nbsp;' : '',
-							!empty($context['can_make_bookmarks']) ? '<a href="' .  $scripturl . '?action=bookmarks;sa=add;topic=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"><img src="' . $settings['default_images_url'] . '/zen/zen_bookmark.png" alt="" title="' . $txt['bookmark_add'] . '" /></a>&nbsp;' : '',
-							'<a href="', $scripturl, '?topic=', $context['current_topic'], '.msg', $context['topic_first_message'], '#msg', $context['topic_first_message'], '" title="', $txt['zen_block_link'], '"><img src="', $settings['default_images_url'], '/zen/zen_anchor.png" alt="', $txt['zen_block_link'], '" /></a>
-						</span>
+						<span class="floatright" style="margin-left: 1em">';
+
+		if ($context['top_topic']) {
+			echo '
+							&nbsp;<img src="' . $settings['default_images_url'] . '/zen/zen_pop.png" alt="' . $txt['zen_block_topic'] . '" title="' . $txt['zen_block_topic'] . '" />';
+		}
+
+		if (!empty($context['can_make_bookmarks'])) {
+			echo '
+							&nbsp;<a href="' .  $scripturl . '?action=bookmarks;sa=add;topic=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"><img src="' . $settings['default_images_url'] . '/zen/zen_bookmark.png" alt="" title="' . $txt['bookmark_add'] . '" /></a>';
+		}
+
+		echo '
+							&nbsp;<a href="', $scripturl, '?topic=', $context['current_topic'], '.msg', $context['topic_first_message'], '#msg', $context['topic_first_message'], '" title="', $txt['zen_block_link'], '"><img src="', $settings['default_images_url'], '/zen/zen_anchor.png" alt="', $txt['zen_block_link'], '" /></a>
+						</span>';
+
+		if (!empty($modSettings['zen_yashare'])) {
+			echo '
+						<span id="yashare-zen" class="floatright"></span>
+						<br class="clear" />';
+		}
+
+		echo '
 					</div>
 				</div>';
 
-		if ($settings['name'] != 'ClearSky')
+		if ($settings['name'] != 'ClearSky') {
 			echo '
 				<span class="lowerframe"><span></span></span>';
+		}
 
 		echo '
 			</div>
@@ -47,66 +65,48 @@ function template_zen_above()
 
 function template_zen_below()
 {
-	global $context, $modSettings, $scripturl, $txt, $topicinfo;
+	global $context, $modSettings, $txt, $scripturl, $topicinfo;
 
-	if (!empty($context['zen_block'])) {
-		echo '
+	if (empty($context['zen_block']))
+		return;
+
+	echo '
 		<script type="text/javascript">window.jQuery || document.write(unescape(\'%3Cscript src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"%3E%3C/script%3E\'))</script>
-		<script type="text/javascript"><!-- // --><![CDATA[
+		<script type="text/javascript">
 			jQuery(document).ready(function($) {
 				$(".zen-head").click(function() {
 					$(this).toggleClass("full_text").toggleClass("mini_text").next().toggle();
 				})
 			})
-		// ]]></script>';
+		</script>';
 
-		if (!empty($modSettings['zen_yashare'])) {
-			echo '
-	<script type="text/javascript" src="//yandex.st/share/share.js" charset="utf-8"></script>
-	<script type="text/javascript"><!-- // --><![CDATA[';
+	if (!empty($modSettings['zen_yashare'])) {
+		$lang = $txt['lang_dictionary'];
+		if (!in_array($txt['lang_dictionary'], array('az', 'be', 'hy', 'ka', 'kk', 'ro', 'ru', 'tr', 'tt', 'uk', 'uz')))
+			$lang = 'en';
 
-			$services = '';
-			if (!empty($modSettings['zen_yashare_array'])) {
-				$temp = explode(",", $modSettings['zen_yashare_array']);
-				foreach ($temp as $name) {
-					$name = '"' . trim($name) . '"';
-					$services .= $name . ",";
-				}
-				$services = substr($services, 0, strlen($services) - 1);
-			}
-
-			$blocks = '';
-			if (!empty($modSettings['zen_yashare_blocks']))	{
-				$temp = explode(",", $modSettings['zen_yashare_blocks']);
-				foreach ($temp as $name) {
-					$name = '"' . trim($name) . '"';
-					$blocks .= $name . ",";
-				}
-				$blocks = substr($blocks, 0, strlen($blocks) - 1);
-			}
-
-			if (!empty($modSettings['zen_yashare']))
-				echo '
-		new Ya.share({
-			element : "yashare-zen",
-			link : "' . $scripturl . '?topic=' . $context['current_topic'] . '.0",
-			elementStyle: {
-				type: "' . $modSettings['zen_yashare'] . '",
-				linkIcon: true,
-				border: false,
-				quickServices: [' . $services . ']
-			},
-			popupStyle: {
-				blocks: {
-					"' . $txt['zen_share_title'] . '": [' . $blocks . ']
+		echo '
+		<script type="text/javascript" src="//yandex.st/share2/share.js"></script>
+		<script type="text/javascript">
+			new Ya.share2("yashare-zen", {
+				content: {
+					url: "' . $scripturl . '?topic=' . $context['current_topic'] . '.0",
+					title: "' . $topicinfo['subject'] . '",
+					description: "' . (!empty($context['optimus_description']) ? $context['optimus_description'] : $context['page_title_html_safe']) . '"' . (!empty($context['optimus_og_image']) ? ',
+					image: "' . $context['optimus_og_image'] . '"' : '') . '
 				},
-				codeForBlog: \'<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.0" target="_blank">' . $topicinfo['subject'] . '</a>\'
-			}
-		})';
-
-			echo '
-	// ]]></script>';
-		}
+				theme: {
+					services: "' . str_replace(' ', '', $modSettings['zen_yashare_services']) . '",
+					lang: "' . $lang . '",
+					limit: ' . (!empty($modSettings['zen_yashare_limit']) ? (int) $modSettings['zen_yashare_limit'] : 0) . ',
+					colorScheme: "' . (!empty($modSettings['zen_yashare_color_scheme']) ? $modSettings['zen_yashare_color_scheme'] : 'normal') . '",
+					shape: "' . (!empty($modSettings['zen_yashare_shape']) ? $modSettings['zen_yashare_shape'] : 'normal') . '",
+					size: "' . (!empty($modSettings['zen_yashare_size']) ? $modSettings['zen_yashare_size'] : 'm') . '",
+					bare: false,
+					curtain: true
+				}
+			});
+		</script>';
 	}
 }
 
