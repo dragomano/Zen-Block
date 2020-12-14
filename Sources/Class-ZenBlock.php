@@ -9,7 +9,7 @@
  * @copyright 2011-2020 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 0.9.1
+ * @version 1.0
  */
 
 if (!defined('SMF'))
@@ -76,51 +76,6 @@ class ZenBlock
 	}
 
 	/**
-	 * Получаем содержание первого сообщения
-	 *
-	 * @return void
-	 */
-	private static function prepareZenBlock()
-	{
-		global $context;
-
-		if (($context['zen_block'] = cache_get_data('zen_block_' . $context['current_topic'], 3600)) == null) {
-			censorText($context['topicinfo']['topic_first_message']);
-			$context['zen_block'] = parse_bbc($context['topicinfo']['topic_first_message']);
-			cache_put_data('zen_block_' . $context['current_topic'], $context['zen_block'], 3600);
-		}
-	}
-
-	/**
-	 * Проверяем популярность темы
-	 *
-	 * @return void
-	 */
-	private static function checkTopicPopularity()
-	{
-		global $context, $boarddir, $scripturl;
-
-		$context['top_topic'] = false;
-
-		if (!is_file($boarddir . '/SSI.php'))
-			return;
-
-		if (($topics = cache_get_data('zen_block_popular_topics', 3600)) == null) {
-			require_once($boarddir . '/SSI.php');
-			$link = $scripturl . '?topic=' . $context['current_topic'] . '.0';
-			$topics = ssi_topTopicsReplies(10, 'array');
-			cache_put_data('zen_block_popular_topics', $topics, 3600);
-		}
-
-		foreach ($topics as $topic) {
-			if ($context['current_topic'] == $topic['id']) {
-				$context['top_topic'] = true;
-				break;
-			}
-		}
-	}
-
-	/**
 	 * Получаем дополнительные данные при выборке сообщений темы
 	 *
 	 * @param array $topic_selects
@@ -144,14 +99,17 @@ class ZenBlock
 	 */
 	public static function prepareDisplayContext(&$output)
 	{
-		global $modSettings, $context;
+		global $modSettings, $options, $context;
 
 		if (empty($modSettings['zen_block_enable']))
 			return;
 
-		if ($modSettings['zen_block_enable'] == 1 ? $output['counter'] == $context['start'] && !empty($output['counter']) : $output['counter'] == $context['start']) {
+		$current_counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
+
+		if ($modSettings['zen_block_enable'] == 1 ? $current_counter == $output['counter'] && !empty($context['start']) : $current_counter == $output['counter']) {
 			self::prepareZenBlock();
 			self::checkTopicPopularity();
+
 			loadTemplate('ZenBlock');
 			show_zen_block();
 		}
@@ -208,8 +166,18 @@ class ZenBlock
 		$context['post_url'] = $scripturl . '?action=admin;area=modsettings;save;sa=zen';
 		$context[$context['admin_menu_name']]['tab_data']['tabs']['zen'] = array('description' => $txt['zen_desc']);
 
+		$addSettings = [];
 		if (!isset($modSettings['zen_yashare_services']))
-			updateSettings(array('zen_yashare_services' => $txt['zen_yashare_services_set']));
+			$addSettings['zen_yashare_services'] = $txt['zen_yashare_services_def'];
+		if (!isset($modSettings['zen_yashare_limit']))
+			$addSettings['zen_yashare_limit'] = 3;
+		if (!isset($modSettings['zen_yashare_shape']))
+			$addSettings['zen_yashare_shape'] = 'normal';
+		if (!isset($modSettings['zen_yashare_size']))
+			$addSettings['zen_yashare_size'] = 'm';
+
+		if (!empty($addSettings))
+			updateSettings($addSettings);
 
 		$txt['select_boards_from_list'] = $txt['zen_ignored_boards_desc'];
 
@@ -224,6 +192,13 @@ class ZenBlock
 			$config_vars[] = array('title', 'zen_yashare_title');
 			$config_vars[] = array('desc', 'zen_yashare_desc');
 			$config_vars[] = array('large_text', 'zen_yashare_services', '" style="width:80%');
+			$config_vars[] = array('select', 'zen_yashare_color_scheme', $txt['zen_yashare_color_scheme_set']);
+
+			if (!empty($modSettings['zen_yashare']) && $modSettings['zen_yashare'] == 'menu')
+				$config_vars[] = array('int', 'zen_yashare_limit');
+
+			$config_vars[] = array('select', 'zen_yashare_shape', $txt['zen_yashare_shape_set']);
+			$config_vars[] = array('select', 'zen_yashare_size', $txt['zen_yashare_size_set']);
 		}
 
 		if ($return_config)
@@ -232,12 +207,65 @@ class ZenBlock
 		// Saving?
 		if (isset($_GET['save'])) {
 			checkSession();
+
 			$save_vars = $config_vars;
 			saveDBSettings($save_vars);
+
 			clean_cache();
+
 			redirectexit('action=admin;area=modsettings;sa=zen');
 		}
 
 		prepareDBSettingContext($config_vars);
+	}
+
+	/**
+	 * Получаем содержание первого сообщения
+	 *
+	 * @return void
+	 */
+	private static function prepareZenBlock()
+	{
+		global $context;
+
+		if (($context['zen_block'] = cache_get_data('zen_block_' . $context['current_topic'], 3600)) == null) {
+			censorText($context['topicinfo']['topic_first_message']);
+
+			$context['zen_block'] = parse_bbc($context['topicinfo']['topic_first_message']);
+
+			cache_put_data('zen_block_' . $context['current_topic'], $context['zen_block'], 3600);
+		}
+	}
+
+	/**
+	 * Проверяем популярность темы
+	 *
+	 * @return void
+	 */
+	private static function checkTopicPopularity()
+	{
+		global $context, $boarddir, $scripturl;
+
+		$context['top_topic'] = false;
+
+		if (!is_file($boarddir . '/SSI.php'))
+			return;
+
+		if (($topics = cache_get_data('zen_block_popular_topics', 3600)) == null) {
+			require_once($boarddir . '/SSI.php');
+
+			$link = $scripturl . '?topic=' . $context['current_topic'] . '.0';
+			$topics = ssi_topTopicsReplies(10, 'array');
+
+			cache_put_data('zen_block_popular_topics', $topics, 3600);
+		}
+
+		foreach ($topics as $topic) {
+			if ($context['current_topic'] == $topic['id']) {
+				$context['top_topic'] = true;
+
+				break;
+			}
+		}
 	}
 }
