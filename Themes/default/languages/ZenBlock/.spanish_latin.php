@@ -11,7 +11,6 @@ $txt['zen_where_is']                 = array('Desactivar', 'No mostrar en la pri
 $txt['zen_ignored_boards']           = 'Foros ignorados';
 $txt['zen_ignored_boards_desc']      = 'Ingrese la ID de los foros donde no se mostrará el Bloque Zen.';
 $txt['zen_yashare']                  = 'Mostrar bloque de enlace de botón "Yandex.Compartir"';
-$txt['zen_yashare_set']              = array(0 => 'Ninguno', 'botón' => 'Como botón', 'Enlace' => 'Como enlace', 'icono' => 'Iconos y menu', 'Ninguno' => 'Solo iconos');
 $txt['zen_yashare_title']            = 'Customization of the Yandex.Share block';
 $txt['zen_yashare_services']         = 'Iconos mostrados en el bloque derecho "Yandex.Compartir"';
 $txt['zen_yashare_services_set']     = 'messenger, vkontakte, facebook, odnoklassniki, telegram, twitter, viber, whatsapp, moimir, pinterest, skype, tumblr, evernote, linkedin, lj, blogger, delicious, digg, reddit, pocket, qzone, renren, sinaWeibo, surfingbird, tencentWeibo';

@@ -185,7 +185,7 @@ class ZenBlock
 			array('select', 'zen_block_enable', $txt['zen_where_is']),
 			array('select', 'zen_block_status', $txt['zen_block_status_set']),
 			array('boards', 'zen_ignored_boards'),
-			array('select', 'zen_yashare', $txt['zen_yashare_set'])
+			array('check', 'zen_yashare')
 		);
 
 		if (!empty($modSettings['zen_yashare'])) {
@@ -193,10 +193,7 @@ class ZenBlock
 			$config_vars[] = array('desc', 'zen_yashare_desc');
 			$config_vars[] = array('large_text', 'zen_yashare_services', '" style="width:80%');
 			$config_vars[] = array('select', 'zen_yashare_color_scheme', $txt['zen_yashare_color_scheme_set']);
-
-			if (!empty($modSettings['zen_yashare']) && $modSettings['zen_yashare'] == 'menu')
-				$config_vars[] = array('int', 'zen_yashare_limit');
-
+			$config_vars[] = array('int', 'zen_yashare_limit');
 			$config_vars[] = array('select', 'zen_yashare_shape', $txt['zen_yashare_shape_set']);
 			$config_vars[] = array('select', 'zen_yashare_size', $txt['zen_yashare_size_set']);
 		}
