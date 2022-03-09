@@ -3,7 +3,7 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>Bugo:ZenBlock</id>
 	<name>Zen Block</name>
-	<version>1.0</version>
+	<version>1.1</version>
 	<type>modification</type>
 
 	<install for="2.1.*">
@@ -11,18 +11,17 @@
 		<readme parsebbc="true" lang="english">readme/english.txt</readme>
 		<require-dir name="Sources" destination="$boarddir">Core files</require-dir>
 		<require-dir name="Themes" destination="$boarddir">Template &amp; Language files</require-dir>
-		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" />
+		<hook hook="integrate_pre_load" function="ZenBlock::hooks#" file="$sourcedir/Class-ZenBlock.php" />
 		<redirect url="?action=admin;area=modsettings;sa=zen" timeout="1000" />
 	</install>
 
 	<uninstall for="2.1.*">
-		<hook hook="integrate_pre_load" function="ZenBlock::hooks" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
+		<hook hook="integrate_pre_load" function="ZenBlock::hooks#" file="$sourcedir/Class-ZenBlock.php" reverse="true" />
 		<remove-file name="$themedir/css/zen.css" />
 		<remove-file name="$themedir/ZenBlock.template.php" />
 		<remove-file name="$sourcedir/Class-ZenBlock.php" />
 		<remove-dir name="$themedir/images/zen" />
 		<remove-dir name="$languagedir/ZenBlock" />
-		<redirect url="?action=admin;area=packages;sa=browse" timeout="1000" />
 	</uninstall>
 
 </package-info>

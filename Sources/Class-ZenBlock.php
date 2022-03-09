@@ -6,49 +6,34 @@
  * @package Zen Block
  * @link https://dragomano.ru/mods/zen-block
  * @author Bugo <bugo@dragomano.ru>
- * @copyright 2011-2020 Bugo
+ * @copyright 2011-2022 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 1.0
+ * @version 1.1
  */
 
 if (!defined('SMF'))
-	die('Hacking attempt...');
+	die('No direct access...');
 
-class ZenBlock
+final class ZenBlock
 {
-	/**
-	 * Подключаем используемые хуки
-	 *
-	 * @return void
-	 */
-	public static function hooks()
+	public function hooks()
 	{
-		add_integration_function('integrate_load_theme', __CLASS__ . '::loadTheme', false, __FILE__);
-		add_integration_function('integrate_menu_buttons', __CLASS__ . '::menuButtons', false, __FILE__);
-		add_integration_function('integrate_display_topic', __CLASS__ . '::displayTopic', false, __FILE__);
-		add_integration_function('integrate_prepare_display_context', __CLASS__ . '::prepareDisplayContext', false, __FILE__);
-		add_integration_function('integrate_admin_areas', __CLASS__ . '::adminAreas', false, __FILE__);
-		add_integration_function('integrate_admin_search', __CLASS__ . '::adminSearch', false, __FILE__);
-		add_integration_function('integrate_modify_modifications', __CLASS__ . '::modifyModifications', false, __FILE__);
+		add_integration_function('integrate_load_theme', __CLASS__ . '::loadTheme#', false, __FILE__);
+		add_integration_function('integrate_menu_buttons', __CLASS__ . '::menuButtons#', false, __FILE__);
+		add_integration_function('integrate_display_topic', __CLASS__ . '::displayTopic#', false, __FILE__);
+		add_integration_function('integrate_prepare_display_context', __CLASS__ . '::prepareDisplayContext#', false, __FILE__);
+		add_integration_function('integrate_admin_areas', __CLASS__ . '::adminAreas#', false, __FILE__);
+		add_integration_function('integrate_admin_search', __CLASS__ . '::adminSearch#', false, __FILE__);
+		add_integration_function('integrate_modify_modifications', __CLASS__ . '::modifyModifications#', false, __FILE__);
 	}
 
-	/**
-	 * Подключаем языковой файл
-	 *
-	 * @return void
-	 */
-	public static function loadTheme()
+	public function loadTheme()
 	{
 		loadLanguage('ZenBlock/');
 	}
 
-	/**
-	 * Подключаем используемые стили и скрипты, а также вызываем необходимые функции
-	 *
-	 * @return void
-	 */
-	public static function menuButtons()
+	public function menuButtons()
 	{
 		global $modSettings, $context;
 
@@ -75,13 +60,7 @@ class ZenBlock
 		});', true);
 	}
 
-	/**
-	 * Получаем дополнительные данные при выборке сообщений темы
-	 *
-	 * @param array $topic_selects
-	 * @return void
-	 */
-	public static function displayTopic(&$topic_selects)
+	public function displayTopic(array &$topic_selects)
 	{
 		global $modSettings;
 
@@ -91,13 +70,7 @@ class ZenBlock
 		$topic_selects[] = 'ms.body AS topic_first_message';
 	}
 
-	/**
-	 * Отображение дзен-блока
-	 *
-	 * @param array $output
-	 * @return void
-	 */
-	public static function prepareDisplayContext(&$output)
+	public function prepareDisplayContext(array &$output)
 	{
 		global $modSettings, $options, $context;
 
@@ -107,58 +80,35 @@ class ZenBlock
 		$current_counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
 
 		if ($modSettings['zen_block_enable'] == 1 ? $current_counter == $output['counter'] && !empty($context['start']) : $current_counter == $output['counter']) {
-			self::prepareZenBlock();
-			self::checkTopicPopularity();
+			$this->prepareZenBlock();
+			$this->checkTopicPopularity();
 
 			loadTemplate('ZenBlock');
 			show_zen_block();
 		}
 	}
 
-	/**
-	 * Добавляем секцию с названием мода в раздел настроек
-	 *
-	 * @param array $admin_areas
-	 * @return void
-	 */
-	public static function adminAreas(&$admin_areas)
+	public function adminAreas(array &$admin_areas)
 	{
 		global $txt;
 
 		$admin_areas['config']['areas']['modsettings']['subsections']['zen'] = array($txt['zen_settings']);
 	}
 
-	/**
-	 * Легкий доступ к настройкам мода через быстрый поиск в админке
-	 *
-	 * @param array $language_files
-	 * @param array $include_files
-	 * @param array $settings_search
-	 * @return void
-	 */
-	public static function adminSearch(&$language_files, &$include_files, &$settings_search)
+	public function adminSearch(array &$language_files, array &$include_files, array &$settings_search)
 	{
-		$settings_search[] = array(__CLASS__ . '::settings', 'area=modsettings;sa=zen');
+		$settings_search[] = array(array($this, 'settings'), 'area=modsettings;sa=zen');
+	}
+
+	public function modifyModifications(array &$subActions)
+	{
+		$subActions['zen'] = array($this, 'settings');
 	}
 
 	/**
-	 * Подключаем настройки мода
-	 *
-	 * @param array $subActions
-	 * @return void
-	 */
-	public static function modifyModifications(&$subActions)
-	{
-		$subActions['zen'] = array(__CLASS__, 'settings');
-	}
-
-	/**
-	 * Определяем настройки мода
-	 *
-	 * @param boolean $return_config
 	 * @return array|void
 	 */
-	public static function settings($return_config = false)
+	public function settings(bool $return_config = false)
 	{
 		global $context, $txt, $scripturl, $modSettings;
 
@@ -209,19 +159,13 @@ class ZenBlock
 			saveDBSettings($save_vars);
 
 			clean_cache();
-
 			redirectexit('action=admin;area=modsettings;sa=zen');
 		}
 
 		prepareDBSettingContext($config_vars);
 	}
 
-	/**
-	 * Получаем содержание первого сообщения
-	 *
-	 * @return void
-	 */
-	private static function prepareZenBlock()
+	private function prepareZenBlock()
 	{
 		global $context;
 
@@ -234,12 +178,7 @@ class ZenBlock
 		}
 	}
 
-	/**
-	 * Проверяем популярность темы
-	 *
-	 * @return void
-	 */
-	private static function checkTopicPopularity()
+	private function checkTopicPopularity()
 	{
 		global $context, $boarddir, $scripturl;
 

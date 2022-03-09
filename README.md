@@ -1,11 +1,9 @@
 # Zen Block for SMF
-![SMF 2.1](https://img.shields.io/badge/SMF-2.1-ed6033.svg?style=flat)
+[![SMF 2.1](https://img.shields.io/badge/SMF-2.1-ed6033.svg?style=flat)](https://github.com/SimpleMachines/SMF2.1)
 ![License](https://img.shields.io/github/license/dragomano/zen-block)
+![Hooks only: Yes](https://img.shields.io/badge/Hooks%20only-YES-blue)
 
-* **Author:** Bugo [dragomano.ru](https://dragomano.ru/mods/zen-block)
-* **License:** [Artistic License 2.0](https://opensource.org/licenses/artistic-license-2.0)
-* **Compatible with:** SMF 2.1.x
-* **Hooks only:** Yes
+* **Tested on:** PHP 7.4.28
 * **Languages:** Russian, English, Spanish, Ukrainian
 
 ## Description
