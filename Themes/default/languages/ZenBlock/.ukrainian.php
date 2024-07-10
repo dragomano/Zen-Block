@@ -12,9 +12,7 @@ $txt['zen_ignored_boards']           = 'Розділи, що ігнорують�
 $txt['zen_ignored_boards_desc']      = 'Відмітьте розділи, в яких Zen Block НЕ повинен відображатись';
 $txt['zen_yashare']                  = 'Показувати блок «Поділитись» від Яндекса';
 $txt['zen_yashare_title']            = 'Налаштування блока &laquo;Поділитись&raquo; від Яндекса';
-$txt['zen_yashare_services']         = 'Іконки, що відображаються <div class="smalltext">Через кому.</div>';
 $txt['zen_yashare_services_def']     = 'twitter, skype, linkedin, telegram, viber, whatsapp';
-$txt['zen_yashare_desc']             = 'Сервіси, що підтримуються: <em>%s</em>';
 $txt['zen_yashare_color_scheme']     = 'Цветовая схема кнопок соцсетей';
 $txt['zen_yashare_color_scheme_set'] = [
     'normal'     => 'Белые иконки на индивидуальном фоне',

@@ -19,13 +19,13 @@ function show_zen_block(): void
 						<span class="zen_symbol lefttext">&#31146;</span>
 						<span class="floatright">';
 
-	if (! empty($modSettings['zen_yashare'])) {
+	if (! empty($modSettings['zen_yashare']) && ! empty($modSettings['zen_yashare_services'])) {
 		$lang = $txt['lang_dictionary'];
 		if (! in_array($txt['lang_dictionary'], ['az', 'be', 'hy', 'ka', 'kk', 'ro', 'ru', 'tr', 'tt', 'uk', 'uz']))
 			$lang = 'en';
 
 		echo '
-							<script src="//yastatic.net/share2/share.js" async="async"></script>
+							<script src="https://yastatic.net/share2/share.js" async="async"></script>
 							<span
 								class="ya-share2"
 								data-curtain
@@ -65,4 +65,41 @@ function show_zen_block(): void
 			</div>
 		</div>
 	</div>';
+}
+
+function template_callback_supported_services(): void
+{
+	global $context;
+
+	echo '
+		<ul class="half_content">';
+
+	$i = 0;
+	$limit = ceil(count($context['zen_yashare_services']) / 2);
+	foreach ($context['zen_yashare_services'] as $service => $show) {
+		if ($i == $limit)
+			echo '
+		</ul>
+		<ul class="half_content">';
+
+		echo '
+			<li>
+				<label for="service_', $service, '">
+					<input
+						type="checkbox"
+						id="service_', $service, '"
+						name="services[', $service, ']"
+						value="', $service, '"', empty($show) ? '' : '
+						checked="checked"', '
+						class="input_check"
+					> ', $service, '
+				</label>
+			</li>';
+
+		$i++;
+	}
+
+	echo '
+		</ul>
+		<br class="clear">';
 }

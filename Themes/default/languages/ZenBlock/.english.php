@@ -12,9 +12,7 @@ $txt['zen_ignored_boards']           = 'Ignored boards';
 $txt['zen_ignored_boards_desc']      = 'Select the boards in which Zen Block should NOT be displayed';
 $txt['zen_yashare']                  = 'Display "Yandex.Share" block';
 $txt['zen_yashare_title']            = 'Customization of the Yandex.Share block';
-$txt['zen_yashare_services']         = 'Displayed icons <div class="smalltext">Comma separated.</div>';
 $txt['zen_yashare_services_def']     = 'twitter, skype, linkedin';
-$txt['zen_yashare_desc']             = 'Supported services: <em>%s</em>';
 $txt['zen_yashare_color_scheme']     = 'The color scheme of the buttons';
 $txt['zen_yashare_color_scheme_set'] = [
     'normal'     => 'White icons with an individual background',

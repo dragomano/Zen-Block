@@ -18,8 +18,9 @@ if (! defined('SMF'))
 final class ZenBlock
 {
 	private array $services = [
-		'messenger, vkontakte, odnoklassniki, telegram, twitter, viber, whatsapp, moimir, pinterest, skype, tumblr,
-		 evernote, linkedin, lj, blogger, delicious, digg, reddit, pocket, qzone, renren, sinaWeibo, surfingbird, tencentWeibo'
+		'messenger', 'vkontakte', 'odnoklassniki', 'telegram', 'twitter', 'viber', 'whatsapp', 'moimir', 'pinterest',
+		'skype', 'tumblr', 'evernote', 'linkedin', 'lj', 'blogger', 'delicious', 'digg', 'reddit', 'pocket', 'qzone',
+		'renren', 'sinaWeibo', 'surfingbird', 'tencentWeibo'
 	];
 
 	public function hooks(): void
@@ -118,9 +119,10 @@ final class ZenBlock
 	{
 		global $context, $txt, $scripturl, $modSettings;
 
+		loadTemplate('ZenBlock');
+
 		$context['page_title'] = $context['settings_title'] = $txt['zen_settings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=modsettings;save;sa=zen';
-		$context[$context['admin_menu_name']]['tab_data']['tabs']['zen'] = ['description' => $txt['zen_desc']];
 
 		$addSettings = [];
 		if (! isset($modSettings['zen_yashare_services']))
@@ -138,6 +140,8 @@ final class ZenBlock
 
 		$txt['select_boards_from_list'] = $txt['zen_ignored_boards_desc'];
 
+		$this->prepareServices();
+
 		$config_vars = [
 			['select', 'zen_block_enable', $txt['zen_where_is']],
 			['select', 'zen_block_status', $txt['zen_block_status_set']],
@@ -147,12 +151,8 @@ final class ZenBlock
 
 		if (! empty($modSettings['zen_yashare'])) {
 			$config_vars[] = ['title', 'zen_yashare_title'];
-			$config_vars[] = [
-				'desc',
-				'zen_yashare_desc',
-				'label' => sprintf($txt['zen_yashare_desc'], implode(',', $this->services))
-			];
-			$config_vars[] = ['large_text', 'zen_yashare_services', '" style="width:80%'];
+			$config_vars[] = ['callback', 'supported_services'];
+			$config_vars[] = '';
 			$config_vars[] = ['select', 'zen_yashare_color_scheme', $txt['zen_yashare_color_scheme_set']];
 			$config_vars[] = ['int', 'zen_yashare_limit'];
 			$config_vars[] = ['select', 'zen_yashare_shape', $txt['zen_yashare_shape_set']];
@@ -162,11 +162,16 @@ final class ZenBlock
 		if ($return_config)
 			return $config_vars;
 
+		$context[$context['admin_menu_name']]['tab_data']['description'] = $txt['zen_desc'];
+
 		// Saving?
 		if (isset($_GET['save'])) {
 			checkSession();
 
+			$_POST['zen_yashare_services'] = implode(', ', $_POST['services'] ?? []);
+
 			$save_vars = $config_vars;
+			$save_vars[] = ['text', 'zen_yashare_services'];
 			saveDBSettings($save_vars);
 
 			clean_cache();
@@ -174,6 +179,19 @@ final class ZenBlock
 		}
 
 		prepareDBSettingContext($config_vars);
+	}
+
+	private function prepareServices(): void
+	{
+		global $modSettings, $context;
+
+		$services = explode(', ', $modSettings['zen_yashare_services'] ?? '');
+
+		$context['zen_yashare_services'] = [];
+
+		foreach ($this->services as $name) {
+			$context['zen_yashare_services'][$name] = in_array($name, $services);
+		}
 	}
 
 	private function prepareZenBlock(): void
