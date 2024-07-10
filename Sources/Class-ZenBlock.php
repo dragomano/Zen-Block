@@ -6,34 +6,39 @@
  * @package Zen Block
  * @link https://dragomano.ru/mods/zen-block
  * @author Bugo <bugo@dragomano.ru>
- * @copyright 2011-2022 Bugo
+ * @copyright 2011-2024 Bugo
  * @license https://opensource.org/licenses/artistic-license-2.0 Artistic License
  *
- * @version 1.1
+ * @version 1.2
  */
 
-if (!defined('SMF'))
+if (! defined('SMF'))
 	die('No direct access...');
 
 final class ZenBlock
 {
-	public function hooks()
+	private array $services = [
+		'messenger, vkontakte, odnoklassniki, telegram, twitter, viber, whatsapp, moimir, pinterest, skype, tumblr,
+		 evernote, linkedin, lj, blogger, delicious, digg, reddit, pocket, qzone, renren, sinaWeibo, surfingbird, tencentWeibo'
+	];
+
+	public function hooks(): void
 	{
-		add_integration_function('integrate_load_theme', __CLASS__ . '::loadTheme#', false, __FILE__);
-		add_integration_function('integrate_menu_buttons', __CLASS__ . '::menuButtons#', false, __FILE__);
-		add_integration_function('integrate_display_topic', __CLASS__ . '::displayTopic#', false, __FILE__);
-		add_integration_function('integrate_prepare_display_context', __CLASS__ . '::prepareDisplayContext#', false, __FILE__);
-		add_integration_function('integrate_admin_areas', __CLASS__ . '::adminAreas#', false, __FILE__);
-		add_integration_function('integrate_admin_search', __CLASS__ . '::adminSearch#', false, __FILE__);
-		add_integration_function('integrate_modify_modifications', __CLASS__ . '::modifyModifications#', false, __FILE__);
+		add_integration_function('integrate_load_theme', self::class . '::loadTheme#', false, __FILE__);
+		add_integration_function('integrate_menu_buttons', self::class . '::menuButtons#', false, __FILE__);
+		add_integration_function('integrate_display_topic', self::class . '::displayTopic#', false, __FILE__);
+		add_integration_function('integrate_prepare_display_context', self::class . '::prepareDisplayContext#', false, __FILE__);
+		add_integration_function('integrate_admin_areas', self::class . '::adminAreas#', false, __FILE__);
+		add_integration_function('integrate_admin_search', self::class . '::adminSearch#', false, __FILE__);
+		add_integration_function('integrate_modify_modifications', self::class . '::modifyModifications#', false, __FILE__);
 	}
 
-	public function loadTheme()
+	public function loadTheme(): void
 	{
 		loadLanguage('ZenBlock/');
 	}
 
-	public function menuButtons()
+	public function menuButtons(): void
 	{
 		global $modSettings, $context;
 
@@ -42,8 +47,9 @@ final class ZenBlock
 
 		$ignored_boards = array();
 
-		if (!empty($modSettings['zen_ignored_boards']))
+		if (! empty($modSettings['zen_ignored_boards'])) {
 			$ignored_boards = explode(",", $modSettings['zen_ignored_boards']);
+		}
 
 		if (in_array($context['current_board'], $ignored_boards)) {
 			$modSettings['zen_block_enable'] = false;
@@ -60,7 +66,7 @@ final class ZenBlock
 		});', true);
 	}
 
-	public function displayTopic(array &$topic_selects)
+	public function displayTopic(array &$topic_selects): void
 	{
 		global $modSettings;
 
@@ -70,7 +76,7 @@ final class ZenBlock
 		$topic_selects[] = 'ms.body AS topic_first_message';
 	}
 
-	public function prepareDisplayContext(array &$output)
+	public function prepareDisplayContext(array $output): void
 	{
 		global $modSettings, $options, $context;
 
@@ -79,7 +85,7 @@ final class ZenBlock
 
 		$current_counter = empty($options['view_newest_first']) ? $context['start'] : $context['total_visible_posts'] - $context['start'];
 
-		if ($modSettings['zen_block_enable'] == 1 ? $current_counter == $output['counter'] && !empty($context['start']) : $current_counter == $output['counter']) {
+		if ($modSettings['zen_block_enable'] == 1 ? $current_counter == $output['counter'] && ! empty($context['start']) : $current_counter == $output['counter']) {
 			$this->prepareZenBlock();
 			$this->checkTopicPopularity();
 
@@ -88,21 +94,21 @@ final class ZenBlock
 		}
 	}
 
-	public function adminAreas(array &$admin_areas)
+	public function adminAreas(array &$admin_areas): void
 	{
 		global $txt;
 
-		$admin_areas['config']['areas']['modsettings']['subsections']['zen'] = array($txt['zen_settings']);
+		$admin_areas['config']['areas']['modsettings']['subsections']['zen'] = [$txt['zen_settings']];
 	}
 
-	public function adminSearch(array &$language_files, array &$include_files, array &$settings_search)
+	public function adminSearch(array &$language_files, array &$include_files, array &$settings_search): void
 	{
-		$settings_search[] = array(array($this, 'settings'), 'area=modsettings;sa=zen');
+		$settings_search[] = [[$this, 'settings'], 'area=modsettings;sa=zen'];
 	}
 
-	public function modifyModifications(array &$subActions)
+	public function modifyModifications(array &$subActions): void
 	{
-		$subActions['zen'] = array($this, 'settings');
+		$subActions['zen'] = [$this, 'settings'];
 	}
 
 	/**
@@ -114,38 +120,43 @@ final class ZenBlock
 
 		$context['page_title'] = $context['settings_title'] = $txt['zen_settings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=modsettings;save;sa=zen';
-		$context[$context['admin_menu_name']]['tab_data']['tabs']['zen'] = array('description' => $txt['zen_desc']);
+		$context[$context['admin_menu_name']]['tab_data']['tabs']['zen'] = ['description' => $txt['zen_desc']];
 
 		$addSettings = [];
-		if (!isset($modSettings['zen_yashare_services']))
+		if (! isset($modSettings['zen_yashare_services']))
 			$addSettings['zen_yashare_services'] = $txt['zen_yashare_services_def'];
-		if (!isset($modSettings['zen_yashare_limit']))
+		if (! isset($modSettings['zen_yashare_limit']))
 			$addSettings['zen_yashare_limit'] = 3;
-		if (!isset($modSettings['zen_yashare_shape']))
+		if (! isset($modSettings['zen_yashare_shape']))
 			$addSettings['zen_yashare_shape'] = 'normal';
-		if (!isset($modSettings['zen_yashare_size']))
+		if (! isset($modSettings['zen_yashare_size']))
 			$addSettings['zen_yashare_size'] = 'm';
 
-		if (!empty($addSettings))
+		if (! empty($addSettings)) {
 			updateSettings($addSettings);
+		}
 
 		$txt['select_boards_from_list'] = $txt['zen_ignored_boards_desc'];
 
-		$config_vars = array(
-			array('select', 'zen_block_enable', $txt['zen_where_is']),
-			array('select', 'zen_block_status', $txt['zen_block_status_set']),
-			array('boards', 'zen_ignored_boards'),
-			array('check', 'zen_yashare')
-		);
+		$config_vars = [
+			['select', 'zen_block_enable', $txt['zen_where_is']],
+			['select', 'zen_block_status', $txt['zen_block_status_set']],
+			['boards', 'zen_ignored_boards'],
+			['check', 'zen_yashare']
+		];
 
-		if (!empty($modSettings['zen_yashare'])) {
-			$config_vars[] = array('title', 'zen_yashare_title');
-			$config_vars[] = array('desc', 'zen_yashare_desc');
-			$config_vars[] = array('large_text', 'zen_yashare_services', '" style="width:80%');
-			$config_vars[] = array('select', 'zen_yashare_color_scheme', $txt['zen_yashare_color_scheme_set']);
-			$config_vars[] = array('int', 'zen_yashare_limit');
-			$config_vars[] = array('select', 'zen_yashare_shape', $txt['zen_yashare_shape_set']);
-			$config_vars[] = array('select', 'zen_yashare_size', $txt['zen_yashare_size_set']);
+		if (! empty($modSettings['zen_yashare'])) {
+			$config_vars[] = ['title', 'zen_yashare_title'];
+			$config_vars[] = [
+				'desc',
+				'zen_yashare_desc',
+				'label' => sprintf($txt['zen_yashare_desc'], implode(',', $this->services))
+			];
+			$config_vars[] = ['large_text', 'zen_yashare_services', '" style="width:80%'];
+			$config_vars[] = ['select', 'zen_yashare_color_scheme', $txt['zen_yashare_color_scheme_set']];
+			$config_vars[] = ['int', 'zen_yashare_limit'];
+			$config_vars[] = ['select', 'zen_yashare_shape', $txt['zen_yashare_shape_set']];
+			$config_vars[] = ['select', 'zen_yashare_size', $txt['zen_yashare_size_set']];
 		}
 
 		if ($return_config)
@@ -165,7 +176,7 @@ final class ZenBlock
 		prepareDBSettingContext($config_vars);
 	}
 
-	private function prepareZenBlock()
+	private function prepareZenBlock(): void
 	{
 		global $context;
 
@@ -178,19 +189,18 @@ final class ZenBlock
 		}
 	}
 
-	private function checkTopicPopularity()
+	private function checkTopicPopularity(): void
 	{
-		global $context, $boarddir, $scripturl;
+		global $context, $boarddir;
 
 		$context['top_topic'] = false;
 
-		if (!is_file($boarddir . '/SSI.php'))
+		if (! is_file($boarddir . '/SSI.php'))
 			return;
 
 		if (($topics = cache_get_data('zen_block_popular_topics', 3600)) == null) {
-			require_once($boarddir . '/SSI.php');
+			require_once $boarddir . '/SSI.php';
 
-			$link = $scripturl . '?topic=' . $context['current_topic'] . '.0';
 			$topics = ssi_topTopicsReplies(10, 'array');
 
 			cache_put_data('zen_block_popular_topics', $topics, 3600);
